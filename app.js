@@ -20,7 +20,7 @@ app.use('/api/horarios', horariosRoutes);
 app.use('/api/pacientes', pacientesRoutes);
 app.use('/api/trabajadores', trabajadoresRoutes);
 
-app.use('/api/imagenes', imagenRoutes);
+app.use('/api/imagenes', logoRoutes);
 
 export default app;
 
