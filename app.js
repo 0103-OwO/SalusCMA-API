@@ -6,6 +6,7 @@ import consultorioRoutes from './src/routes/consultorioRoute.js';
 import horariosRoutes from './src/routes/horariosRoutes.js';
 import pacientesRoutes from './src/routes/pacientesRoute.js';
 import trabajadoresRoutes from './src/routes/trabajadoresRoute.js';
+import logoRoutes from './src/routes/logoRoute.js';
 
 const app = express();
 
@@ -18,6 +19,8 @@ app.use('/api/consultorio', consultorioRoutes);
 app.use('/api/horarios', horariosRoutes);
 app.use('/api/pacientes', pacientesRoutes);
 app.use('/api/trabajadores', trabajadoresRoutes);
+
+app.use('/api/imagenes', imagenRoutes);
 
 export default app;
 

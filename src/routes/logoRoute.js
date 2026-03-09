@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { upload } from '../config/multer.js';
-import * as ctrl from '../controllers/imagenController.js';
+import * as ctrl from '../controllers/logoController.js';
 
 const router = Router();
 

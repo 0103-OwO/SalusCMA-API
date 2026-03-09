@@ -1,4 +1,4 @@
-import * as model from '../models/imagenModelo.js';
+import * as model from '../models/logoModelo.js';
 import cloudinary from '../config/cloudinary.js';
 
 export const mostrarLogo = async (req, res) => {
