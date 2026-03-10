@@ -1,6 +1,19 @@
 import * as model from '../models/mvvhModelo.js';
 import cloudinary from '../config/cloudinary.js';
 
+export const obtenerTodo = async (req, res) => {
+    try {
+        const data = await model.getMisionVision();
+        if (!data) {
+            return res.status(404).json({ error: 'No se encontraron datos institucionales' });
+        }
+        res.json(data);
+    } catch (error) {
+        console.error("Error en obtenerTodo:", error);
+        res.status(500).json({ error: 'Error al obtener los datos' });
+    }
+};
+
 export const actualizarSeccionInstitucional = async (req, res) => {
     try {
         const id = req.body.id_mision_vision || 1;
