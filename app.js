@@ -7,6 +7,7 @@ import horariosRoutes from './src/routes/horariosRoutes.js';
 import pacientesRoutes from './src/routes/pacientesRoute.js';
 import trabajadoresRoutes from './src/routes/trabajadoresRoute.js';
 import logoRoutes from './src/routes/logoRoute.js';
+import mvvhRoutes from './src/routes/mvvhRoute.js';
 
 const app = express();
 
@@ -14,6 +15,8 @@ app.use(cors());
 app.use(express.json());
 
 app.use('/api/imagenes', logoRoutes);
+
+app.use('/api/mvvh', mvvhRoutes);
 
 app.use('/api/especialidades', especialidadRoutes);
 app.use('/api/citas', citasRoutes);
