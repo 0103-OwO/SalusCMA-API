@@ -8,6 +8,7 @@ import pacientesRoutes from './src/routes/pacientesRoute.js';
 import trabajadoresRoutes from './src/routes/trabajadoresRoute.js';
 import logoRoutes from './src/routes/logoRoute.js';
 import mvvhRoutes from './src/routes/mvvhRoute.js';
+import footerRoutes from './src/routes/footerRoute.js';
 
 const app = express();
 
@@ -17,6 +18,8 @@ app.use(express.json());
 app.use('/api/imagenes', logoRoutes);
 
 app.use('/api/mvvh', mvvhRoutes);
+
+app.use('/api/footer', footerRoutes);
 
 app.use('/api/especialidades', especialidadRoutes);
 app.use('/api/citas', citasRoutes);
