@@ -19,15 +19,6 @@ export const obtenerTodo = async (req, res) => {
 export const actualizarSeccionInstitucional = async (req, res) => {
     upload.single('imagen')(req, res, async (err) => {
         try {
-            if (err instanceof multer.MulterError) {
-                if (err.code === 'LIMIT_FILE_SIZE') {
-                    return res.status(400).json({ error: 'La imagen es muy pesada (Máximo 5MB)' });
-                }
-                return res.status(400).json({ error: err.message });
-            } else if (err) {
-                return res.status(400).json({ error: err.message });
-            }
-
             const id = req.body.id_mision_vision || 1;
             let campoTexto, valorTexto, campoImg, carpeta;
 
