@@ -13,14 +13,14 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+app.use('/api/imagenes', logoRoutes);
+
 app.use('/api/especialidades', especialidadRoutes);
 app.use('/api/citas', citasRoutes);
 app.use('/api/consultorio', consultorioRoutes);
 app.use('/api/horarios', horariosRoutes);
 app.use('/api/pacientes', pacientesRoutes);
 app.use('/api/trabajadores', trabajadoresRoutes);
-
-app.use('/api/imagenes', logoRoutes);
 
 export default app;
 
