@@ -10,6 +10,7 @@ import logoRoutes from './src/routes/logoRoute.js';
 import mvvhRoutes from './src/routes/mvvhRoute.js';
 import footerRoutes from './src/routes/footerRoute.js';
 import publicidadRoutes from './src/routes/publicidadRoute.js';
+import contactoRoutes from './src/routes/contactoRoute.js';
 
 const app = express();
 
@@ -24,6 +25,7 @@ app.use('/api/footer', footerRoutes);
 
 app.use('/api/publicidad', publicidadRoutes);
 
+app.use('/api/contacto', contactoRoutes);
 app.use('/api/especialidades', especialidadRoutes);
 app.use('/api/citas', citasRoutes);
 app.use('/api/consultorio', consultorioRoutes);
