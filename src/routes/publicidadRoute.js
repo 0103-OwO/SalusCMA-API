@@ -4,13 +4,13 @@ import * as ctrl from '../controllers/publicidadController.js';
 
 const router = Router();
 
-const cpUpload = upload.fields([
+const uploadBanners = upload.fields([
     { name: 'img_uno', maxCount: 1 },
     { name: 'img_dos', maxCount: 1 },
     { name: 'img_tres', maxCount: 1 }
 ]);
 
 router.get('/', ctrl.obtenerPublicidad);
-router.put('/update', cpUpload, ctrl.actualizarPublicidad);
+router.put('/update', uploadBanners, ctrl.actualizarPublicidad);
 
 export default router;

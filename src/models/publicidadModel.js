@@ -5,22 +5,18 @@ export const getPublicidad = async () => {
     return rows[0];
 };
 
-export const updatePublicidad = async (id, urls) => {
-    const campos = [];
-    const valores = [];
+export const updatePublicidad = async (datos) => {
+    const { img_uno, img_dos, img_tres, id } = datos;
+    
+    let sql = `UPDATE publicidad SET id_publicidad = ?`;
+    let params = [id];
 
-    for (const [key, value] of Object.entries(urls)) {
-        if (value) {
-            campos.push(`${key} = ?`);
-            valores.push(value);
-        }
-    }
+    if (img_uno) { sql += `, img_uno = ?`; params.push(img_uno); }
+    if (img_dos) { sql += `, img_dos = ?`; params.push(img_dos); }
+    if (img_tres) { sql += `, img_tres = ?`; params.push(img_tres); }
 
-    if (campos.length === 0) return null;
+    sql += ` WHERE id_publicidad = ?`;
+    params.push(id);
 
-    const sql = `UPDATE publicidad SET ${campos.join(', ')} WHERE id_publicidad = ?`;
-    valores.push(id);
-
-    const [result] = await db.query(sql, valores);
-    return result;
+    return await db.query(sql, params);
 };
