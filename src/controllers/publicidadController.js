@@ -1,4 +1,4 @@
-import * as model from '../models/publicidadModelo.js';
+import * as model from '../models/publicidadModel.js';
 import cloudinary from '../config/cloudinary.js';
 
 const uploadToCloudinary = (fileBuffer) => {
