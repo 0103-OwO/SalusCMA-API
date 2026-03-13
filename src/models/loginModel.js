@@ -1,19 +1,8 @@
 import db from '../config/db.js';
 
-export const buscarCliente = async (identificador) => {
-    const [rows] = await db.query(
-        'SELECT * FROM usuarios_clientes WHERE email = ? OR usuario = ?',
-        [identificador, identificador]
-    );
-    return rows[0];
-};
-
-export const buscarUsuarioInterno = async (usuario) => {
-    const [rows] = await db.query(
-        'SELECT * FROM usuario WHERE usuario = ?',
-        [usuario]
-    );
-    return rows[0];
+export const buscarUsuarioGlobal = async (identificador) => {
+    const [result] = await db.query('CALL sp_login_usuario(?)', [identificador]);
+    return result[0][0]; 
 };
 
 export const getNombrePaciente = async (id) => {
