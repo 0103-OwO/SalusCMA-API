@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { upload } from '../config/multer.js';
 import * as ctrl from '../controllers/publicidadController.js';
+import { verificarToken } from '../middlewares/auth.middleware.js';
 
 const router = Router();
 
@@ -11,6 +12,7 @@ const uploadBanners = upload.fields([
 ]);
 
 router.get('/', ctrl.obtenerPublicidad);
-router.put('/update', uploadBanners, ctrl.actualizarPublicidad);
+
+router.put('/update', verificarToken, uploadBanners, ctrl.actualizarPublicidad);
 
 export default router;

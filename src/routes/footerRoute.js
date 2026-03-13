@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { upload } from '../config/multer.js';
 import * as ctrl from '../controllers/footerController.js';
+import { verificarToken } from '../middlewares/auth.middleware.js'; 
 
 const router = Router();
 
@@ -12,6 +13,6 @@ const footerUploads = upload.fields([
     { name: 'img_x', maxCount: 1 }
 ]);
 
-router.put('/update', footerUploads, ctrl.actualizarFooter);
+router.put('/update', verificarToken, footerUploads, ctrl.actualizarFooter);
 
 export default router;
