@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { upload } from '../config/multer.js';
 import * as ctrl from '../controllers/publicidadController.js';
-import { verificarToken } from '../middlewares/auth.middleware.js';
+import { verificarToken } from '../middleware/authMiddleware.js';
 
 const router = Router();
 
