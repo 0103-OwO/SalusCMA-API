@@ -8,12 +8,23 @@ export const login = async (req, res) => {
     try {
         const user = await buscarUsuarioGlobal(identificador);
 
-        if (!user || !(await bcrypt.compare(contrasena, user.contrasena))) {
+        if (!user) {
+            return res.status(401).json({ success: false, error: 'Usuario no encontrado' });
+        }
+
+        const hashCompatible = user.contrasena.replace(/^\$2y\$/, '$2a$');
+        const isMatch = await bcrypt.compare(contrasena, hashCompatible);
+
+        if (!isMatch) {
             return res.status(401).json({ success: false, error: 'Credenciales incorrectas' });
         }
 
         let nombreReal = 'Usuario';
-        if (user.tipo_usuario === 'cliente' && user.id_referencia) {
+        
+        if (user.nombre_real) {
+            nombreReal = user.nombre_real;
+        } 
+        else if (user.tipo_usuario === 'cliente' && user.id_referencia) {
             const p = await getNombrePaciente(user.id_referencia);
             nombreReal = p ? p.nombre : 'Paciente';
         } else if (user.tipo_usuario === 'interno' && user.id_referencia) {
@@ -36,7 +47,7 @@ export const login = async (req, res) => {
             success: true,
             token,
             rol: user.id_rol,
-            nombre: nombreReal
+            nombre: nombreReal 
         });
 
     } catch (error) {
