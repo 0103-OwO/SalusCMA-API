@@ -1,4 +1,4 @@
-import * as model from '../models/loginModel.js';
+import { buscarUsuarioGlobal, getNombrePaciente, getNombreTrabajador } from '../models/loginModel.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
@@ -6,7 +6,7 @@ export const login = async (req, res) => {
     const { identificador, contrasena } = req.body;
 
     try {
-        const user = await model.buscarUsuarioGlobal(identificador);
+        const user = await buscarUsuarioGlobal(identificador);
 
         if (!user || !(await bcrypt.compare(contrasena, user.contrasena))) {
             return res.status(401).json({ success: false, error: 'Credenciales incorrectas' });
@@ -14,10 +14,10 @@ export const login = async (req, res) => {
 
         let nombreReal = 'Usuario';
         if (user.tipo_usuario === 'cliente' && user.id_referencia) {
-            const p = await model.getNombrePaciente(user.id_referencia);
+            const p = await getNombrePaciente(user.id_referencia);
             nombreReal = p ? p.nombre : 'Paciente';
         } else if (user.tipo_usuario === 'interno' && user.id_referencia) {
-            const t = await model.getNombreTrabajador(user.id_referencia);
+            const t = await getNombreTrabajador(user.id_referencia);
             nombreReal = t ? t.nombre : 'Empleado';
         }
 
