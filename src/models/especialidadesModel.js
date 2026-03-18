@@ -36,3 +36,12 @@ export const deleteEspecialidad = async (id) => {
   );
   return { message: 'Especialidad eliminada' };
 };
+
+//Validacion para evitar duplicados,
+export const verificarDuplicado = async (nombre, idExcluido) => {
+    const [rows] = await db.query(
+        "SELECT id_especialidad FROM especialidad WHERE especialidad = ? AND id_especialidad != ?",
+        [nombre, idExcluido]
+    );
+    return rows.length > 0;
+};
