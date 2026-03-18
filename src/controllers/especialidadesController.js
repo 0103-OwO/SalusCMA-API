@@ -33,7 +33,7 @@ export const crear = async (req, res) => {
   }
 
   try {
-    const existeDuplicado = await especialidadModel.checkDuplicateName(especialidad, 0);
+    const existeDuplicado = await especialidadModel.verificarDuplicado(especialidad, 0);
 
     if (existeDuplicado) {
       return res.status(400).json({
@@ -58,7 +58,7 @@ export const actualizar = async (req, res) => {
   }
 
   try {
-    const existeDuplicado = await especialidadModel.checkDuplicateName(especialidad, id);
+    const existeDuplicado = await especialidadModel.verificarDuplicado(especialidad, id);
 
     if (existeDuplicado) {
       return res.status(400).json({
