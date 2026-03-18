@@ -30,7 +30,7 @@ export const crear = async (req, res) => {
       return new Promise((resolve, reject) => {
         const stream = cloudinary.uploader.upload_stream(
           {
-            folder: 'trabajadores', // Carpeta solicitada
+            folder: 'salus_cma/trabajadores', 
             resource_type: 'image'
           },
           (error, result) => {
@@ -75,7 +75,7 @@ export const actualizar = async (req, res) => {
       const uploadToCloudinary = () => {
         return new Promise((resolve, reject) => {
           const stream = cloudinary.uploader.upload_stream(
-            { folder: 'trabajadores' },
+            { folder: 'salus_cma/trabajadores' },
             (error, result) => {
               if (error) reject(error);
               else resolve(result);
