@@ -1,4 +1,4 @@
-import * as especialidadModel from '../models/especialidadModel.js';
+import * as especialidadModel from '../models/especialidadesModel.js';
 
 // Controladores para manejar las solicitudes relacionadas con especialidades
 export const obtenerTodas = async (req, res) => {
