@@ -10,6 +10,22 @@ export const obtenerTodas = async (req, res) => {
     }
 };
 
+//Busca una especialidad por su ID, si no se encuentra devuelve un error 404. Si ocurre un error en la consulta, devuelve un error 500.
+export const obtenerPorId = async (req, res) => {
+    const { id } = req.params; 
+    try {
+        const [rows] = await db.query('SELECT * FROM especialidad WHERE id_especialidad = ?', [id]);
+        
+        if (rows.length === 0) {
+            return res.status(404).json({ error: 'Especialidad no encontrada' });
+        }
+        
+        res.json(rows[0]);
+    } catch (error) {
+        res.status(500).json({ error: 'Error al obtener la especialidad' });
+    }
+};
+
 //Crea las especialidades, se valida que no exista una con el mismo nombre para evitar duplicados. El nombre de la especialidad es obligatorio.
 export const crear = async (req, res) => {
     const { especialidad } = req.body;

@@ -5,6 +5,7 @@ import { verificarToken } from '../middleware/authMiddleware.js';
 const router = express.Router();
 
 router.get('/', especialidadController.obtenerTodas);
+router.get('/:id', especialidadController.obtenerPorId);
 
 // Crear, Editar y Borrar requiere TOKEN (Solo personal autorizado es decir admin)
 router.post('/', verificarToken, especialidadController.crear);
