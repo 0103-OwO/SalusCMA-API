@@ -32,8 +32,9 @@ app.use('/api/contacto', contactoRoutes);
 
 app.use('/api/especialidades', especialidadRoutes);
 
-app.use('/api/citas', citasRoutes);
 app.use('/api/consultorio', consultorioRoutes);
+
+app.use('/api/citas', citasRoutes);
 app.use('/api/horarios', horariosRoutes);
 app.use('/api/pacientes', pacientesRoutes);
 app.use('/api/trabajadores', trabajadoresRoutes);

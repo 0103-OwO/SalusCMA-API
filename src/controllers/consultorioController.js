@@ -1,48 +1,86 @@
-import * as model from '../models/consultorioModel.js';
+import * as consultorioModel from '../models/consultorioModel.js';
 
-export const getConsultorios = async (req, res) => {
+export const obtenerTodos = async (req, res) => {
   try {
-    const data = await model.getAllConsultorios();
+    const datos = await consultorioModel.getAllConsultorios();
+    res.json(datos);
+  } catch (error) {
+    res.status(500).json({ error: 'Error al obtener consultorios' });
+  }
+};
+
+export const obtenerPorId = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const data = await consultorioModel.getConsultorioById(id);
+
+    if (!data) return res.status(404).json({ error: 'No existe' });
+
     res.json(data);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'Error server' });
   }
 };
 
-export const getConsultorio = async (req, res) => {
+export const crear = async (req, res) => {
+  const { nombre, descripcion, area, piso } = req.body;
+
+  if (!nombre || nombre.trim() === '') {
+    return res.status(400).json({ error: 'El nombre es obligatorio' });
+  }
+  if (!area || area.trim() === '') {
+    return res.status(400).json({ error: 'El área es obligatoria' });
+  }
+  if (!piso || piso.trim() === '') {
+    return res.status(400).json({ error: 'El piso es obligatorio' });
+  }
+
   try {
-    const data = await model.getConsultorioById(req.params.id);
-    if (!data) return res.status(404).json({ msg: "No encontrado" });
-    res.json(data);
+    const existe = await consultorioModel.verificarDuplicado(nombre);
+    if (existe) {
+      return res.status(400).json({ error: 'El nombre del consultorio ya existe' });
+    }
+
+    const nuevo = await consultorioModel.createConsultorio({ descripcion, nombre, area, piso });
+    res.status(201).json({ success: true, message: 'Consultorio agregado correctamente', id: nuevo.id_consultorio });
+
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'Error al agregar consultorio' });
   }
 };
 
-export const createConsultorio = async (req, res) => {
+export const actualizar = async (req, res) => {
+  const { id } = req.params;
+  const { nombre, descripcion, area, piso } = req.body;
+
+  if (!nombre || nombre.trim() === '') {
+    return res.status(400).json({ error: 'El nombre es obligatorio' });
+  }
+  if (!area || area.trim() === '') {
+    return res.status(400).json({ error: 'El área es obligatoria' });
+  }
+  if (!piso || piso.trim() === '') {
+    return res.status(400).json({ error: 'El piso es obligatorio' });
+  }
   try {
-    const nuevo = await model.createConsultorio(req.body);
-    res.status(201).json(nuevo);
+    const existe = await consultorioModel.verificarDuplicado(nombre, id);
+    if (existe) {
+      return res.status(400).json({ error: 'Ese nombre ya está en uso por otro consultorio' });
+    }
+
+    await consultorioModel.updateConsultorio(id, { nombre, descripcion, area, piso });
+    res.json({ success: true, message: 'Consultorio actualizado correctamente' });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'Error al actualizar' });
   }
 };
 
-export const updateConsultorio = async (req, res) => {
+export const eliminar = async (req, res) => {
+  const { id } = req.params;
   try {
-    const updated = await model.updateConsultorio(req.params.id, req.body);
-    res.json(updated);
+    await consultorioModel.deleteConsultorio(id);
+    res.json({ success: true, message: 'Consultorio eliminado' });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'Error al eliminar' });
   }
 };
-
-export const deleteConsultorio = async (req, res) => {
-  try {
-    const result = await model.deleteConsultorio(req.params.id);
-    res.json(result);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
-

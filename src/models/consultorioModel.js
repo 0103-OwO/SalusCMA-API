@@ -44,3 +44,10 @@ export const deleteConsultorio = async (id) => {
   return { message: 'Consultorio eliminado' };
 };
 
+export const verificarDuplicado = async (nombre, idExcluido = 0) => {
+  const [rows] = await db.query(
+    'SELECT id_consultorio FROM consultorio WHERE nombre = ? AND id_consultorio != ?',
+    [nombre, idExcluido]
+  );
+  return rows.length > 0;
+};
