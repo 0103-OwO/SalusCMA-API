@@ -11,12 +11,11 @@ export const getAllCitas = async () => {
             con.nombre AS nombre_consultorio,
             c.estado
         FROM citas c
-        INNER JOIN pacientes p ON c.id_paciente = p.id_paciente
+        INNER JOIN pacientes p ON c.id_paciente = p.id_pacientes
         INNER JOIN trabajadores t ON c.id_medico = t.id_trabajador
-        LEFT JOIN consultorios con ON c.id_consultorio = con.id_consultorio
-        ORDER BY c.fecha ASC, c.hora ASC
+        LEFT JOIN consultorio con ON c.id_consultorio = con.id_consultorio
+        ORDER BY c.fecha DESC, c.hora DESC
     `;
-
   const [rows] = await db.query(query);
   return rows;
 };
