@@ -1,7 +1,19 @@
 import db from '../config/db.js';
 
 export const getAllHorarios = async () => {
-  const [rows] = await db.query('SELECT * FROM horarios');
+  const query = `
+        SELECT 
+            h.id_horario,
+            h.hora_entrada,
+            h.hora_salida,
+            DATE_FORMAT(h.fecha_inicio, '%d/%m/%Y') AS fecha_inicio,
+            DATE_FORMAT(h.fecha_fin, '%d/%m/%Y') AS fecha_fin,
+            CONCAT(t.nombre, ' ', t.apellido_paterno, ' ', t.apellido_materno) AS nombre_trabajador
+        FROM horarios h
+        INNER JOIN trabajadores t ON h.id_trabajador = t.id_trabajador
+    `;
+
+  const [rows] = await db.query(query);
   return rows;
 };
 

@@ -1,7 +1,25 @@
 import db from '../config/db.js';
 
+import db from '../config/db.js';
+
 export const getAllCitas = async () => {
-  const [rows] = await db.query('SELECT * FROM citas');
+  const query = `
+        SELECT 
+            c.id_cita,
+            DATE_FORMAT(c.fecha, '%d/%m/%Y') AS fecha,
+            c.hora,
+            p.curp AS curp_paciente,
+            CONCAT(t.nombre, ' ', t.apellido_paterno, ' ', t.apellido_materno) AS nombre_medico,
+            con.nombre AS nombre_consultorio,
+            c.estado
+        FROM citas c
+        INNER JOIN pacientes p ON c.id_paciente = p.id_paciente
+        INNER JOIN trabajadores t ON c.id_medico = t.id_trabajador
+        LEFT JOIN consultorios con ON c.id_consultorio = con.id_consultorio
+        ORDER BY c.fecha ASC, c.hora ASC
+    `;
+
+  const [rows] = await db.query(query);
   return rows;
 };
 
