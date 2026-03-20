@@ -4,6 +4,6 @@ import { verificarToken } from '../middleware/authMiddleware.js';
 
 const router = Router();
 
-router.get('/',verificarToken, roles.obtenerRol);
+router.get('/',roles.obtenerRol);
 
 export default router;
