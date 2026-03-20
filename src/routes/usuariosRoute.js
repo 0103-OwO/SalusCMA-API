@@ -4,8 +4,8 @@ import { verificarToken } from '../middleware/authMiddleware.js';
 
 const router = Router();
 
-router.get('/',verificarToken ,usuarios.listar);
-router.get('/:id', verificarToken, usuarios.obtenerUno);
+router.get('/' ,usuarios.listar);
+router.get('/:id', usuarios.obtenerUno);
 
 router.post('/',verificarToken, usuarios.crear);
 router.put('/:id',verificarToken, usuarios.actualizar);
