@@ -1,5 +1,5 @@
 import * as usuarioModel from '../models/usuariosModel.js';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 
 export const listar = async (req, res) => {
   try {
