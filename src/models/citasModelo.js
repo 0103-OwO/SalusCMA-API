@@ -1,7 +1,5 @@
 import db from '../config/db.js';
 
-import db from '../config/db.js';
-
 export const getAllCitas = async () => {
   const query = `
         SELECT 
