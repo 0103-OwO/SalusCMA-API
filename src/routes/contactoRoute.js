@@ -6,5 +6,6 @@ const router = express.Router();
 
 router.get('/', controller.obtenerContacto);
 router.put('/update', verificarToken, controller.actualizarContacto);
+router.post('/enviar', controller.enviarMensaje);
 
 export default router;
