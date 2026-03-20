@@ -2,10 +2,10 @@ import axios from 'axios';
 
 const verifyTurnstile = async (req, res, next) => {
   try {
-    // 1. Extraer el token del body
+    //Extraer el token del body
     const token = req.body['cf-turnstile-response'];
 
-    // 2. Si no hay token → bloquear
+    //Si no hay token → bloquear
     if (!token || token.trim() === '') {
       return res.status(400).json({
         ok:      false,
@@ -13,7 +13,8 @@ const verifyTurnstile = async (req, res, next) => {
       });
     }
 
-    // 3. Verificar con la API de Cloudflare
+    //Verificar con la API de Cloudflare
+    //Axios es como fetch pero mas "moderno" y era mas facil de implementar ya que la conversion de JSON se hace automaticamente
     const cfResponse = await axios.post(
       'https://challenges.cloudflare.com/turnstile/v0/siteverify',
       new URLSearchParams({
@@ -24,10 +25,10 @@ const verifyTurnstile = async (req, res, next) => {
       { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
     );
 
-    // 4. Evaluar respuesta de Cloudflare
+    //Evaluar respuesta de Cloudflare
     const { success, 'error-codes': errorCodes, hostname } = cfResponse.data;
 
-    // 5. Si falló → bloquear
+    //Si falló → bloquear
     if (!success) {
       console.warn(`[Turnstile] Fallido. Errores: ${(errorCodes || []).join(', ')} | IP: ${req.ip}`);
       return res.status(403).json({
@@ -36,16 +37,16 @@ const verifyTurnstile = async (req, res, next) => {
       });
     }
 
-    // 6. En producción: verificar que el token venga de tu dominio
+    //En producción: verificar que el token venga de tu dominio
     if (process.env.NODE_ENV === 'production') {
-      const dominioEsperado = 'tudominio.com'; // ← cambiar en producción
+      const dominioEsperado = 'tudominio.com'; //Se cambia en clpudflare por el dominio real
       if (hostname !== dominioEsperado) {
         console.warn(`[Turnstile] Hostname sospechoso: ${hostname}`);
         return res.status(403).json({ ok: false, message: 'Origen no autorizado.' });
       }
     }
 
-    // 7. Todo válido → continuar al controlador
+    //Todo válido → continuar al controlador
     next();
 
   } catch (error) {

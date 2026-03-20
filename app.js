@@ -15,6 +15,7 @@ import footerRoutes from './src/routes/footerRoute.js';
 import publicidadRoutes from './src/routes/publicidadRoute.js';
 import contactoRoutes from './src/routes/contactoRoute.js';
 import loginRoutes from './src/routes/loginRoute.js';
+import usuariosRoutes from './src/routes/usuariosRoute.js';
 
 const app = express();
 
@@ -39,6 +40,8 @@ app.use('/api/especialidades', especialidadRoutes);
 app.use('/api/consultorio', consultorioRoutes);
 
 app.use('/api/trabajadores', trabajadoresRoutes);
+
+app.use('/api/usuarios', usuariosRoutes);
 
 app.use('/api/citas', citasRoutes);
 app.use('/api/horarios', horariosRoutes);
