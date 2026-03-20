@@ -1,12 +1,16 @@
 import * as model from '../models/horariosModel.js';
 
-export const getHorarios = async (req, res) => {
-  try {
-    const data = await model.getAllHorarios();
-    res.json(data);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+export const obtenerHorarios = async (req, res) => {
+    try {
+        const data = await model.getAllHorarios();
+        if (!data || data.length === 0) {
+            return res.status(404).json({ message: 'No se encontraron horarios registrados' });
+        }
+        res.json(data);
+    } catch (error) {
+        console.error("Error en obtenerHorarios:", error);
+        res.status(500).json({ error: 'Error al obtener los horarios' });
+    }
 };
 
 export const getHorario = async (req, res) => {

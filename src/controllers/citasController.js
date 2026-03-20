@@ -1,12 +1,16 @@
 import * as model from '../models/citasModelo.js';
 
-export const getCitas = async (req, res) => {
-  try {
-    const data = await model.getAllCitas();
-    res.json(data);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+export const obtenerCitas = async (req, res) => {
+    try {
+        const data = await model.getAllCitas();
+        if (!data || data.length === 0) {
+            return res.status(404).json({ message: 'No se encontraron citas' });
+        }
+        res.json(data);
+    } catch (error) {
+        console.error("Error en obtener Citas:", error);
+        res.status(500).json({ error: 'Error al obtener las citas' });
+    }
 };
 
 export const getCita = async (req, res) => {

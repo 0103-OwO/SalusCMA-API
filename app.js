@@ -17,6 +17,7 @@ import contactoRoutes from './src/routes/contactoRoute.js';
 import loginRoutes from './src/routes/loginRoute.js';
 import usuariosRoutes from './src/routes/usuariosRoute.js';
 import rolRoutes from './src/routes/rolRoute.js';
+import historialRoutes from './src/routes/historialRoute.js';
 
 const app = express();
 
@@ -47,8 +48,12 @@ app.use('/api/usuarios', usuariosRoutes);
 app.use('/api/roles', rolRoutes);
 
 app.use('/api/citas', citasRoutes);
+
 app.use('/api/horarios', horariosRoutes);
+
 app.use('/api/pacientes', pacientesRoutes);
+
+app.use('/api/historial', historialRoutes);
 
 
 export default app;
