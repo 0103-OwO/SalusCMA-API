@@ -28,3 +28,19 @@ export const deleteTrabajador = async (id) => {
   await db.query('DELETE FROM trabajadores WHERE id_trabajador = ?', [id]);
   return { message: 'Trabajador eliminado' };
 };
+
+export const getMedicos = async () => {
+    const query = `
+        SELECT 
+            t.id_trabajador, 
+            t.nombre, 
+            t.apellido_paterno, 
+            t.apellido_materno 
+        FROM trabajadores t
+        INNER JOIN usuario u ON t.id_trabajador = u.id_trabajador
+        INNER JOIN rol r ON u.id_rol = r.id_rol
+        WHERE r.nombre = 'Medico' OR u.id_rol = 8;
+    `;
+    const [rows] = await db.query(query);
+    return rows;
+};

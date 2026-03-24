@@ -5,6 +5,7 @@ import { upload } from '../config/multer.js';
 
 const router = Router();
 
+router.get('/medicos', trabajadores.obtenerMedicosCitas);
 router.get('/', trabajadores.listar);
 router.get('/:id', trabajadores.obtenerUno);
 
