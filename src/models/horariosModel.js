@@ -74,3 +74,22 @@ export const deleteHorario = async (id) => {
     );
     return { message: 'Horario eliminado' };
 };
+
+export const getHorarioByMedico = async (id_trabajador) => {
+    const query = `
+        SELECT 
+            id_horario,
+            lunes_ent, lunes_sal,
+            martes_ent, martes_sal,
+            miercoles_ent, miercoles_sal,
+            jueves_ent, jueves_sal,
+            viernes_ent, viernes_sal,
+            DATE_FORMAT(fecha_inicio, '%Y-%m-%d') AS fecha_inicio,
+            DATE_FORMAT(fecha_fin, '%Y-%m-%d') AS fecha_fin
+        FROM horarios
+        WHERE id_trabajador = ?
+        ORDER BY fecha_inicio DESC
+    `;
+    const [rows] = await db.query(query, [id_trabajador]);
+    return rows;
+};
