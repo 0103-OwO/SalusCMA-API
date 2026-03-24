@@ -1,5 +1,5 @@
 import * as model from '../models/pacientesModel.js';
-
+import bcrypt from 'bcryptjs';
 export const getPacientes = async (req, res) => {
   try {
     const data = await model.getAllPacientes();
@@ -21,23 +21,32 @@ export const getPaciente = async (req, res) => {
 
 export const createPaciente = async (req, res) => {
   try {
-    const { curp } = req.body;
+    const { curp, contrasena } = req.body;
 
     const existe = await model.checkCurpExists(curp);
-
     if (existe) {
-      return res.status(400).json({
-        msg: "El CURP ya se encuentra registrado en el sistema."
-      });
+      return res.status(400).json({ msg: "La CURP ya se encuentra registrada." });
     }
 
-    const nuevo = await model.createPaciente(req.body);
-    res.status(201).json(nuevo);
+    const salt = await bcrypt.genSalt(10);
+    const hashContrasena = await bcrypt.hash(contrasena, salt);
+    await model.createPacienteCompleto({
+      ...req.body,
+      contrasena: hashContrasena
+    });
+
+    res.status(201).json({ msg: "Paciente y usuario registrados con éxito." });
+
   } catch (error) {
-    res.status(500).json({ error: error.message });
+
+    if (error.sqlState === '45000') {
+      return res.status(400).json({ msg: error.message });
+    }
+
+    console.error(error);
+    res.status(500).json({ error: "Error interno del servidor al registrar." });
   }
 };
-
 export const updatePaciente = async (req, res) => {
   try {
     const updated = await model.updatePaciente(req.params.id, req.body);

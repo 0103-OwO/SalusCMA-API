@@ -2,7 +2,7 @@ import db from '../config/db.js';
 
 export const checkCurpExists = async (curp) => {
   const [result] = await db.query('SELECT fn_curp_existe(?) AS existe', [curp]);
-  return result[0].existe === 1; 
+  return result[0].existe === 1;
 };
 
 export const getAllPacientes = async () => {
@@ -23,7 +23,7 @@ export const createPaciente = async ({
   nombre,
   apellido_paterno,
   apellido_materno,
-  sexo, 
+  sexo,
   fecha_nacimiento
 }) => {
   const [result] = await db.query(
@@ -50,5 +50,26 @@ export const deletePaciente = async (id) => {
     [id]
   );
   return { message: 'Paciente eliminado' };
+};
+
+export const createPacienteCompleto = async (datos) => {
+  const {
+    curp,
+    nombre,
+    apellido_paterno,
+    apellido_materno,
+    sexo,
+    fecha_nacimiento,
+    correo,
+    usuario,
+    contrasena
+  } = datos;
+
+  const [result] = await db.query(
+    'CALL sp_registrar_paciente_completo(?, ?, ?, ?, ?, ?, ?, ?, ?)',
+    [curp, nombre, apellido_paterno, apellido_materno, sexo, fecha_nacimiento, correo, usuario, contrasena]
+  );
+
+  return result;
 };
 
