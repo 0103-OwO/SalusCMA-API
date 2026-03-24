@@ -1,5 +1,10 @@
 import db from '../config/db.js';
 
+export const checkCurpExists = async (curp) => {
+  const [result] = await db.query('SELECT fn_curp_existe(?) AS existe', [curp]);
+  return result[0].existe === 1; 
+};
+
 export const getAllPacientes = async () => {
   const [rows] = await db.query('SELECT * FROM pacientes');
   return rows;
@@ -18,13 +23,14 @@ export const createPaciente = async ({
   nombre,
   apellido_paterno,
   apellido_materno,
+  sexo, 
   fecha_nacimiento
 }) => {
   const [result] = await db.query(
-    `INSERT INTO pacientes
-    (curp, nombre, apellido_paterno, apellido_materno, fecha_nacimiento)
-    VALUES (?, ?, ?, ?, ?)`,
-    [curp, nombre, apellido_paterno, apellido_materno, fecha_nacimiento]
+    `INSERT INTO pacientes 
+    (curp, nombre, apellido_paterno, apellido_materno, sexo, fecha_nacimiento) 
+    VALUES (?, ?, ?, ?, ?, ?)`,
+    [curp, nombre, apellido_paterno, apellido_materno, sexo, fecha_nacimiento]
   );
 
   return { id_pacientes: result.insertId };

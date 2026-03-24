@@ -21,6 +21,16 @@ export const getPaciente = async (req, res) => {
 
 export const createPaciente = async (req, res) => {
   try {
+    const { curp } = req.body;
+
+    const existe = await model.checkCurpExists(curp);
+
+    if (existe) {
+      return res.status(400).json({
+        msg: "El CURP ya se encuentra registrado en el sistema."
+      });
+    }
+
     const nuevo = await model.createPaciente(req.body);
     res.status(201).json(nuevo);
   } catch (error) {

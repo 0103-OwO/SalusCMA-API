@@ -1,12 +1,14 @@
 import { Router } from 'express';
 import * as ctrl from '../controllers/pacientesController.js';
+import { verificarToken } from '../middleware/authMiddleware.js';
 
 const router = Router();
 
-router.get('/', ctrl.getPacientes);
-router.get('/:id', ctrl.getPaciente);
-router.post('/', ctrl.createPaciente);
-router.put('/:id', ctrl.updatePaciente);
-router.delete('/:id', ctrl.deletePaciente);
+router.get('/',verificarToken, ctrl.getPacientes);
+router.get('/:id',verificarToken, ctrl.getPaciente);
+
+router.post('/',verificarToken, ctrl.createPaciente);
+router.put('/:id',verificarToken, ctrl.updatePaciente);
+router.delete('/:id',verificarToken, ctrl.deletePaciente);
 
 export default router;
