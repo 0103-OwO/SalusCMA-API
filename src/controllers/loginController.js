@@ -20,10 +20,10 @@ export const login = async (req, res) => {
         }
 
         let nombreReal = 'Usuario';
-        
+
         if (user.nombre_real) {
             nombreReal = user.nombre_real;
-        } 
+        }
         else if (user.tipo_usuario === 'cliente' && user.id_referencia) {
             const p = await getNombrePaciente(user.id_referencia);
             nombreReal = p ? p.nombre : 'Paciente';
@@ -33,8 +33,8 @@ export const login = async (req, res) => {
         }
 
         const token = jwt.sign(
-            { 
-                id: user.id_interno,
+            {
+                id: user.id_referencia || user.id_interno,
                 rol: user.id_rol,
                 nombre: nombreReal,
                 tipo: user.tipo_usuario
@@ -47,7 +47,7 @@ export const login = async (req, res) => {
             success: true,
             token,
             rol: user.id_rol,
-            nombre: nombreReal 
+            nombre: nombreReal
         });
 
     } catch (error) {

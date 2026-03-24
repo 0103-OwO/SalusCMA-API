@@ -54,10 +54,13 @@ export const getCitasMedico = async (req, res) => {
   try {
     const id_medico = req.usuario.id;
 
+    console.log("Buscando citas para el médico con ID:", id_medico);
+
     const citas = await model.getCitasByMedico(id_medico);
-    res.status(200).json(citas);
+
+    res.json(citas || []);
   } catch (error) {
-    console.error("Error:", error);
-    res.status(500).json({ error: "Error al obtener tus citas" });
+    console.error("Error en getCitasMedico:", error);
+    res.status(500).json({ error: "Error al obtener las citas" });
   }
 };
