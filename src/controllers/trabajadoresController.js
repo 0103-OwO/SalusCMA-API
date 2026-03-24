@@ -113,12 +113,14 @@ export const eliminar = async (req, res) => {
 
 export const obtenerMedicosCitas = async (req, res) => {
     try {
-        const medicos = await model.getMedicos();
+        const medicos = await trabajadorModel.getMedicos(); 
+        
         if (medicos.length === 0) {
             return res.status(404).json({ message: "No se encontraron médicos con rol activo" });
         }
         res.json(medicos);
     } catch (error) {
+        console.error("Error en obtenerMedicosCitas:", error); 
         res.status(500).json({ error: "Error al obtener la lista de médicos" });
     }
 };
