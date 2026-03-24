@@ -59,7 +59,7 @@ export const updatePaciente = async (req, res) => {
     const { id } = req.params;
     const { curp } = req.body;
 
-    const existeEnOtro = await model.checkCurpExistsInOthers(curp, id);
+    const existeEnOtro = await model.checkCurpExists(curp, id);
     if (existeEnOtro) {
       return res.status(400).json({ msg: "La CURP ingresada ya pertenece a otro paciente." });
     }
