@@ -58,7 +58,7 @@ export const getCitasMedico = async (req, res) => {
 
     res.status(200).json(citas);
   } catch (error) {
-    console.error("Error en getCitasMedico:", error);
-    res.status(500).json({ error: "Error al obtener tus citas" });
+    console.error("ERROR EN SQL/CONTROLLER:", error);
+    res.status(500).json({ error: "Error en la consulta de base de datos" });
   }
 };
