@@ -52,13 +52,12 @@ export const deleteCita = async (req, res) => {
 
 export const getCitasMedico = async (req, res) => {
   try {
-    const id_trabajador_token = req.user.id;
+    const id_medico = req.usuario.id;
 
-    const citas = await model.getCitasByMedico(id_trabajador_token);
-
+    const citas = await model.getCitasByMedico(id_medico);
     res.status(200).json(citas);
   } catch (error) {
-    console.error("ERROR EN SQL/CONTROLLER:", error);
-    res.status(500).json({ error: "Error en la consulta de base de datos" });
+    console.error("Error:", error);
+    res.status(500).json({ error: "Error al obtener tus citas" });
   }
 };
