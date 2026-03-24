@@ -49,3 +49,15 @@ export const deleteCita = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+export const getCitasMedico = async (req, res) => {
+    try {
+        const id_medico = req.user.id; 
+
+        const citas = await getCitasByMedico(id_medico);
+        
+        res.status(200).json(citas);
+    } catch (error) {
+        res.status(500).json({ error: "Error al obtener tus citas" });
+    }
+};
