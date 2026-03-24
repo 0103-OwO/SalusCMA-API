@@ -21,11 +21,16 @@ export const getPaciente = async (req, res) => {
 
 export const createPaciente = async (req, res) => {
   try {
-    const { curp, contrasena, usuario } = req.body;
+    const { curp, usuario, contrasena } = req.body;
 
-    const existe = await model.checkCurpExists(curp);
-    if (existe) {
+    const existeCurp = await model.checkCurpExists(curp);
+    if (existeCurp) {
       return res.status(400).json({ msg: "La CURP ya se encuentra registrada." });
+    }
+
+    const existeUsuario = await model.checkUserExists(usuario); 
+    if (existeUsuario) {
+      return res.status(400).json({ msg: "El nombre de usuario ya está en uso." });
     }
 
     const salt = await bcrypt.genSalt(10);
@@ -45,19 +50,32 @@ export const createPaciente = async (req, res) => {
       return res.status(400).json({ msg: error.sqlMessage || error.message });
     }
 
-    if (error.code === 'ER_DUP_ENTRY') {
-      return res.status(400).json({ msg: "Error: Ya existe un registro con esos datos (CURP o Usuario)." });
-    }
-
     res.status(500).json({ error: "Error interno del servidor al registrar." });
   }
 };
+
 export const updatePaciente = async (req, res) => {
   try {
-    const updated = await model.updatePaciente(req.params.id, req.body);
-    res.json(updated);
+    const { id } = req.params;
+    const { curp } = req.body;
+
+    const existeEnOtro = await model.checkCurpExistsInOthers(curp, id);
+    if (existeEnOtro) {
+      return res.status(400).json({ msg: "La CURP ingresada ya pertenece a otro paciente." });
+    }
+
+    const updated = await model.updatePaciente(id, req.body);
+
+    res.json({ msg: "Datos personales actualizados con éxito", data: updated });
+
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error("Error al actualizar:", error);
+
+    if (error.sqlState === '45000') {
+      return res.status(400).json({ msg: error.sqlMessage });
+    }
+
+    res.status(500).json({ error: "Error interno al actualizar el paciente." });
   }
 };
 
