@@ -1,16 +1,16 @@
 import * as model from '../models/citasModelo.js';
 
 export const obtenerCitas = async (req, res) => {
-    try {
-        const data = await model.getAllCitas();
-        if (!data || data.length === 0) {
-            return res.status(404).json({ message: 'No se encontraron citas' });
-        }
-        res.json(data);
-    } catch (error) {
-        console.error("Error en obtener Citas:", error);
-        res.status(500).json({ error: 'Error al obtener las citas' });
+  try {
+    const data = await model.getAllCitas();
+    if (!data || data.length === 0) {
+      return res.status(404).json({ message: 'No se encontraron citas' });
     }
+    res.json(data);
+  } catch (error) {
+    console.error("Error en obtener Citas:", error);
+    res.status(500).json({ error: 'Error al obtener las citas' });
+  }
 };
 
 export const getCita = async (req, res) => {
@@ -51,13 +51,14 @@ export const deleteCita = async (req, res) => {
 };
 
 export const getCitasMedico = async (req, res) => {
-    try {
-        const id_medico = req.user.id; 
+  try {
+    const id_trabajador = req.user.id;
 
-        const citas = await getCitasByMedico(id_trabajador);
-        
-        res.status(200).json(citas);
-    } catch (error) {
-        res.status(500).json({ error: "Error al obtener tus citas" });
-    }
+    const citas = await getCitasByMedico(id_trabajador);
+
+    res.status(200).json(citas);
+  } catch (error) {
+    console.error("Error en getCitasMedico:", error);
+    res.status(500).json({ error: "Error al obtener tus citas" });
+  }
 };
