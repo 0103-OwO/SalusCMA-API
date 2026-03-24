@@ -7,7 +7,7 @@ const router = Router();
 router.get('/mis-citas', verificarToken, ctrl.getCitasMedico);
 router.get('/', verificarToken, ctrl.obtenerCitas);
 router.get('/:id', verificarToken, ctrl.getCita);
-router.post('/', verificarToken, ctrl.createCita);
+router.post('/', verificarToken, ctrl.registrarCita);
 router.put('/:id', verificarToken, ctrl.updateCita);
 router.delete('/:id', verificarToken, ctrl.deleteCita);
 

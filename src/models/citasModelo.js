@@ -28,23 +28,12 @@ export const getCitaById = async (id) => {
   return rows[0];
 };
 
-export const createCita = async ({
-  fecha,
-  hora,
-  id_paciente,
-  id_medico,
-  id_consultorio,
-  estado,
-  descripcion
-}) => {
+export const createCita = async ({ fecha, hora, id_paciente, id_medico, id_consultorio }) => {
   const [result] = await db.query(
-    `INSERT INTO citas 
-    (fecha, hora, id_paciente, id_medico, id_consultorio, estado, descripcion)
-    VALUES (?, ?, ?, ?, ?, ?, ?)`,
-    [fecha, hora, id_paciente, id_medico, id_consultorio, estado, descripcion]
+    'CALL sp_agendar_cita(?, ?, ?, ?, ?)',
+    [fecha, hora, id_paciente, id_medico, id_consultorio]
   );
-
-  return { id_cita: result.insertId };
+  return result;
 };
 
 export const updateCita = async (id, data) => {

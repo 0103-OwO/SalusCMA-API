@@ -2,14 +2,17 @@ import * as model from '../models/citasModelo.js';
 
 export const obtenerCitas = async (req, res) => {
   try {
+    await db.query(`
+            UPDATE citas 
+            SET estado = 'No asistió' 
+            WHERE estado = 'Pendiente' 
+            AND CAST(CONCAT(fecha, ' ', hora) AS DATETIME) < NOW()
+        `);
+
     const data = await model.getAllCitas();
-    if (!data || data.length === 0) {
-      return res.status(404).json({ message: 'No se encontraron citas' });
-    }
-    res.json(data);
+    res.json(data || []);
   } catch (error) {
-    console.error("Error en obtener Citas:", error);
-    res.status(500).json({ error: 'Error al obtener las citas' });
+    res.status(500).json({ error: 'Error al procesar citas' });
   }
 };
 
@@ -23,12 +26,13 @@ export const getCita = async (req, res) => {
   }
 };
 
-export const createCita = async (req, res) => {
+export const registrarCita = async (req, res) => {
   try {
-    const nueva = await model.createCita(req.body);
-    res.status(201).json(nueva);
+    await model.createCita(req.body);
+    res.status(201).json({ message: 'Cita agendada con éxito' });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error("Error SQL:", error.sqlMessage);
+    res.status(400).json({ error: error.sqlMessage || 'Error al agendar cita' });
   }
 };
 
