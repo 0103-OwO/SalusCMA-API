@@ -64,22 +64,22 @@ export const deleteCita = async (id) => {
 };
 
 // Función para obtener citas de un médico específico
-export const getCitasByMedico = async (id_trabajador) => {
+export const getCitasByMedico = async (id_trabajador_logueado) => {
   const query = `
         SELECT 
             c.id_cita,
-            c.fecha,
+            DATE_FORMAT(c.fecha, '%Y-%m-%d') AS fecha, -- Formato estándar para JS
             c.hora,
             p.curp AS curp_paciente,
-            CONCAT(t.nombre, ' ', t.apellido_paterno) AS nombre_medico,
+            CONCAT(t.nombre, ' ', t.apellido_paterno, ' ', t.apellido_materno) AS nombre_medico,
             con.nombre AS nombre_consultorio
         FROM citas c
-        INNER JOIN pacientes p ON c.id_paciente = p.id_pacientes -- Ajustado según tu getAllCitas
-        INNER JOIN trabajadores t ON c.id_medico = t.id_trabajador   -- Ajustado según tu getAllCitas
+        INNER JOIN pacientes p ON c.id_paciente = p.id_pacientes 
+        INNER JOIN trabajadores t ON c.id_medico = t.id_trabajador 
         LEFT JOIN consultorio con ON c.id_consultorio = con.id_consultorio
-        WHERE c.id_medico = ? -- Filtramos por la columna correcta
+        WHERE c.id_medico = ? 
         ORDER BY c.fecha ASC, c.hora ASC
     `;
-  const [rows] = await db.query(query, [id_trabajador]);
+  const [rows] = await db.query(query, [id_trabajador_logueado]);
   return rows;
 };

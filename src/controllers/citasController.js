@@ -52,9 +52,9 @@ export const deleteCita = async (req, res) => {
 
 export const getCitasMedico = async (req, res) => {
   try {
-    const id_trabajador = req.user.id;
+    const id_trabajador_token = req.user.id;
 
-    const citas = await getCitasByMedico(id_trabajador);
+    const citas = await model.getCitasByMedico(id_trabajador_token);
 
     res.status(200).json(citas);
   } catch (error) {
