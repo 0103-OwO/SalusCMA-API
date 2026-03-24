@@ -54,7 +54,7 @@ export const getCitasMedico = async (req, res) => {
     try {
         const id_medico = req.user.id; 
 
-        const citas = await getCitasByMedico(id_medico);
+        const citas = await getCitasByMedico(id_trabajador);
         
         res.status(200).json(citas);
     } catch (error) {
