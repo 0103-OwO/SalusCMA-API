@@ -21,7 +21,7 @@ export const getPaciente = async (req, res) => {
 
 export const createPaciente = async (req, res) => {
   try {
-    const { curp, contrasena } = req.body;
+    const { curp, contrasena, usuario } = req.body;
 
     const existe = await model.checkCurpExists(curp);
     if (existe) {
@@ -30,6 +30,7 @@ export const createPaciente = async (req, res) => {
 
     const salt = await bcrypt.genSalt(10);
     const hashContrasena = await bcrypt.hash(contrasena, salt);
+
     await model.createPacienteCompleto({
       ...req.body,
       contrasena: hashContrasena
@@ -38,12 +39,16 @@ export const createPaciente = async (req, res) => {
     res.status(201).json({ msg: "Paciente y usuario registrados con éxito." });
 
   } catch (error) {
+    console.error("Fallo en el registro:", error);
 
-    if (error.sqlState === '45000') {
-      return res.status(400).json({ msg: error.message });
+    if (error.sqlState === '45000' || error.code === 'ER_SIGNAL_EXCEPTION') {
+      return res.status(400).json({ msg: error.sqlMessage || error.message });
     }
 
-    console.error(error);
+    if (error.code === 'ER_DUP_ENTRY') {
+      return res.status(400).json({ msg: "Error: Ya existe un registro con esos datos (CURP o Usuario)." });
+    }
+
     res.status(500).json({ error: "Error interno del servidor al registrar." });
   }
 };
