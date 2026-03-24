@@ -72,3 +72,12 @@ export const getCitasByMedico = async (id_trabajador_logueado) => {
   const [rows] = await db.query(query, [id_trabajador_logueado]);
   return rows;
 };
+
+export const actualizarCitasVencidas = async () => {
+  await db.query(`
+    UPDATE citas 
+    SET estado = 'No asistió' 
+    WHERE estado = 'Pendiente' 
+    AND CAST(CONCAT(fecha, ' ', hora) AS DATETIME) < NOW()
+  `);
+};

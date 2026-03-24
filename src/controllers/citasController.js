@@ -2,12 +2,7 @@ import * as model from '../models/citasModelo.js';
 
 export const obtenerCitas = async (req, res) => {
   try {
-    await db.query(`
-            UPDATE citas 
-            SET estado = 'No asistió' 
-            WHERE estado = 'Pendiente' 
-            AND CAST(CONCAT(fecha, ' ', hora) AS DATETIME) < NOW()
-        `);
+    await model.actualizarCitasVencidas();
 
     const data = await model.getAllCitas();
     res.json(data || []);
