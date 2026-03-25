@@ -4,7 +4,7 @@ import { verificarToken } from '../middleware/authMiddleware.js';
 
 const router = Router();
 
-router.get('/mi-perfil', verificarToken, ctrl.obtenerPerfilPaciente);
+router.get('/mi-perfil',ctrl.obtenerPerfilPaciente);
 
 router.put('/actualizar-perfil', verificarToken, ctrl.updatePacientePerfil);
 
