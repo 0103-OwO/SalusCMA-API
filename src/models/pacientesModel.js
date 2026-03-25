@@ -66,23 +66,29 @@ export const deletePaciente = async (id) => {
 
 export const createPacienteCompleto = async (datos) => {
   const {
-    curp,
-    nombre,
-    apellido_paterno,
-    apellido_materno,
-    sexo,
-    fecha_nacimiento,
-    correo,
-    usuario,
-    contrasena
+    curp, nombre, apellido_paterno, apellido_materno,
+    sexo, fecha_nacimiento, correo, usuario, contrasena
   } = datos;
 
-  const [result] = await db.query(
-    'CALL sp_registrar_paciente_completo(?, ?, ?, ?, ?, ?, ?, ?, ?)',
-    [curp, nombre, apellido_paterno, apellido_materno, sexo, fecha_nacimiento, correo, usuario, contrasena]
-  );
+  const queryPaciente = `
+        INSERT INTO pacientes (curp, nombre, apellido_paterno, apellido_materno, sexo, fecha_nacimiento) 
+        VALUES (?, ?, ?, ?, ?, ?)`;
 
-  return result;
+  const [resPaciente] = await db.query(queryPaciente, [
+    curp, nombre, apellido_paterno, apellido_materno, sexo, fecha_nacimiento
+  ]);
+
+  const id_paciente = resPaciente.insertId;
+
+  const queryUsuario = `
+        INSERT INTO usuarios_clientes (email, usuario, contrasena, id_rol, id_paciente) 
+        VALUES (?, ?, ?, ?, ?)`;
+
+  const [resUsuario] = await db.query(queryUsuario, [
+    correo, usuario, contrasena, 19, id_paciente
+  ]);
+
+  return { id_paciente, success: true };
 };
 
 export const getPacienteFullProfile = async (id_usuario_cliente) => {
@@ -106,23 +112,36 @@ export const getPacienteFullProfile = async (id_usuario_cliente) => {
 };
 
 export const updatePacienteYUsuario = async (id_paciente, datos) => {
-    const { curp, nombre, apellido_paterno, apellido_materno, sexo, fecha_nacimiento } = datos;
-    
-    const { email, usuario } = datos;
+  const { curp, nombre, apellido_paterno, apellido_materno, sexo, fecha_nacimiento } = datos;
 
-    const queryPacientes = `
+  const { email, usuario } = datos;
+
+  const queryPacientes = `
         UPDATE pacientes 
         SET curp = ?, nombre = ?, apellido_paterno = ?, apellido_materno = ?, sexo = ?, fecha_nacimiento = ?
         WHERE id_pacientes = ?`;
-    
-    await db.query(queryPacientes, [curp, nombre, apellido_paterno, apellido_materno, sexo, fecha_nacimiento, id_paciente]);
 
-    const queryUsuarios = `
+  await db.query(queryPacientes, [curp, nombre, apellido_paterno, apellido_materno, sexo, fecha_nacimiento, id_paciente]);
+
+  const queryUsuarios = `
         UPDATE usuarios_clientes 
         SET email = ?, usuario = ? 
         WHERE id_paciente = ?`;
-    
-    await db.query(queryUsuarios, [email, usuario, id_paciente]);
 
-    return { id_paciente, success: true };
+  await db.query(queryUsuarios, [email, usuario, id_paciente]);
+
+  return { id_paciente, success: true };
+};
+
+export const checkEmailExists = async (email) => {
+    const query = `
+        SELECT email FROM (
+            SELECT email FROM usuarios_clientes
+            UNION
+            SELECT correo AS email FROM trabajadores
+        ) AS todos_los_correos
+        WHERE email = ? LIMIT 1
+    `;
+    const [rows] = await db.query(query, [email]);
+    return rows.length > 0;
 };

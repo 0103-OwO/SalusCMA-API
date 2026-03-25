@@ -24,11 +24,15 @@ export const createPaciente = async (req, res) => {
     const { curp, usuario, contrasena } = req.body;
 
     if (await model.checkCurpExists(curp)) {
-      return res.status(400).json({ msg: "La CURP ya se encuentra registrada." });
+      return res.status(400).json({ msg: "La CURP ya existe." });
     }
 
     if (await model.checkUserExists(usuario)) {
       return res.status(400).json({ msg: "El nombre de usuario ya existe." });
+    }
+
+    if(await model.checkEmailExists(req.body.correo)) {
+      return res.status(400).json({ msg: "El correo electrónico ya existe." });
     }
 
     const salt = await bcrypt.genSalt(10);
