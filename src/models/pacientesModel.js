@@ -92,7 +92,7 @@ export const createPacienteCompleto = async (datos) => {
 };
 
 export const getPacienteFullProfile = async (id) => {
-  // Ajustado exactamente a los nombres de tu dump SQL
+
   const query = `
         SELECT p.id_pacientes, p.curp, p.nombre, p.apellido_paterno, p.apellido_materno, 
                p.sexo, p.fecha_nacimiento, u.email, u.usuario
