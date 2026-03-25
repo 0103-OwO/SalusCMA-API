@@ -5,6 +5,7 @@ import { verificarToken } from '../middleware/authMiddleware.js';
 const router = Router();
 
 router.get('/mis-citas', verificarToken, ctrl.getCitasMedico);
+router.get('/citas-paciente', verificarToken, ctrl.getCitasPaciente);
 router.get('/', verificarToken, ctrl.obtenerCitas);
 router.get('/:id', verificarToken, ctrl.getCita);
 router.post('/', verificarToken, ctrl.registrarCita);
