@@ -81,3 +81,25 @@ export const actualizarCitasVencidas = async () => {
     AND CAST(CONCAT(fecha, ' ', hora) AS DATETIME) < NOW()
   `);
 };
+
+// Función para obtener citas de un paciente específico
+export const getCitasByPaciente = async (id_paciente_logueado) => {
+    const query = `
+        SELECT 
+            c.id_cita,
+            DATE_FORMAT(c.fecha, '%Y-%m-%d') AS fecha,
+            c.hora,
+            p.curp AS curp_paciente,
+            CONCAT(t.nombre, ' ', t.apellido_paterno, ' ', t.apellido_materno) AS nombre_medico,
+            con.nombre AS nombre_consultorio,
+            c.estado
+        FROM citas c
+        INNER JOIN pacientes p ON c.id_paciente = p.id_pacientes 
+        INNER JOIN trabajadores t ON c.id_medico = t.id_trabajador 
+        LEFT JOIN consultorio con ON c.id_consultorio = con.id_consultorio
+        WHERE c.id_paciente = ? 
+        ORDER BY c.fecha ASC, c.hora ASC
+    `;
+    const [rows] = await db.query(query, [id_paciente_logueado]);
+    return rows;
+};
