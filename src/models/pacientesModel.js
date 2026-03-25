@@ -112,29 +112,50 @@ export const getPacienteFullProfile = async (id_usuario_cliente) => {
 };
 
 export const updatePacienteYUsuario = async (id_paciente, datos) => {
-  const { curp, nombre, apellido_paterno, apellido_materno, sexo, fecha_nacimiento } = datos;
+  const {
+    curp, nombre, apellido_paterno, apellido_materno,
+    sexo, fecha_nacimiento, email, usuario, contrasena
+  } = datos;
 
-  const { email, usuario } = datos;
+  const connection = await db.getConnection();
+  try {
+    await connection.beginTransaction();
 
-  const queryPacientes = `
-        UPDATE pacientes 
-        SET curp = ?, nombre = ?, apellido_paterno = ?, apellido_materno = ?, sexo = ?, fecha_nacimiento = ?
-        WHERE id_pacientes = ?`;
+    const queryPacientes = `
+            UPDATE pacientes 
+            SET curp = ?, nombre = ?, apellido_paterno = ?, apellido_materno = ?, sexo = ?, fecha_nacimiento = ?
+            WHERE id_pacientes = ?`;
 
-  await db.query(queryPacientes, [curp, nombre, apellido_paterno, apellido_materno, sexo, fecha_nacimiento, id_paciente]);
+    await connection.query(queryPacientes, [
+      curp, nombre, apellido_paterno, apellido_materno, sexo, fecha_nacimiento, id_paciente
+    ]);
 
-  const queryUsuarios = `
-        UPDATE usuarios_clientes 
-        SET email = ?, usuario = ? 
-        WHERE id_paciente = ?`;
+    let queryUsuarios = `UPDATE usuarios_clientes SET email = ?, usuario = ?`;
+    const paramsUsuarios = [email, usuario];
 
-  await db.query(queryUsuarios, [email, usuario, id_paciente]);
+    if (contrasena) {
+      queryUsuarios += `, contrasena = ?`;
+      paramsUsuarios.push(contrasena);
+    }
 
-  return { id_paciente, success: true };
+    queryUsuarios += ` WHERE id_paciente = ?`;
+    paramsUsuarios.push(id_paciente);
+
+    await connection.query(queryUsuarios, paramsUsuarios);
+
+    await connection.commit();
+    return { success: true };
+  } catch (error) {
+    await connection.rollback();
+    throw error;
+  } finally {
+    connection.release();
+  }
 };
 
+
 export const checkEmailExists = async (email) => {
-    const query = `
+  const query = `
         SELECT email FROM (
             SELECT email FROM usuarios_clientes
             UNION
@@ -142,6 +163,6 @@ export const checkEmailExists = async (email) => {
         ) AS todos_los_correos
         WHERE email = ? LIMIT 1
     `;
-    const [rows] = await db.query(query, [email]);
-    return rows.length > 0;
+  const [rows] = await db.query(query, [email]);
+  return rows.length > 0;
 };

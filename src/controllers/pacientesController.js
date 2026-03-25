@@ -127,11 +127,29 @@ export const obtenerPerfilPaciente = async (req, res) => {
 };
 
 export const updatePacientePerfil = async (req, res) => {
-  const { id } = req.params;
+  const idPaciente = req.usuario.id_referencia;
+  const { curp, contrasena } = req.body;
 
   try {
-    // Ejecutar la actualización (usando el modelo que separa las tablas)
-    await model.updatePacienteYUsuario(id, req.body);
+    if (!idPaciente) {
+      return res.status(400).json({ msg: "Sesión no válida para paciente." });
+    }
+
+    const curpExiste = await model.checkCurpExists(curp, idPaciente);
+    if (curpExiste) {
+      return res.status(400).json({ msg: "La CURP ya pertenece a otro registro." });
+    }
+
+    const datosUpdate = { ...req.body };
+
+    if (contrasena && contrasena.trim() !== "") {
+      const salt = await bcrypt.genSalt(10);
+      datosUpdate.contrasena = await bcrypt.hash(contrasena, salt);
+    } else {
+      delete datosUpdate.contrasena;
+    }
+
+    await model.updatePacienteYUsuario(idPaciente, datosUpdate);
 
     res.json({
       success: true,
@@ -139,42 +157,16 @@ export const updatePacientePerfil = async (req, res) => {
     });
 
   } catch (error) {
-    console.error("DEBUG - Error en updatePaciente:", error);
-
-    // --- EXCEPCIÓN 1: Entradas Duplicadas (MySQL Error 1062) ---
     if (error.errno === 1062) {
-      const campoDuplicado = error.sqlMessage;
-
-      if (campoDuplicado.includes('curp')) {
-        return res.status(400).json({ msg: "La CURP ya está registrada por otro paciente." });
-      }
-      if (campoDuplicado.includes('email')) {
-        return res.status(400).json({ msg: "Este correo electrónico ya está en uso." });
-      }
-      if (campoDuplicado.includes('usuario')) {
-        return res.status(400).json({ msg: "El nombre de usuario no está disponible." });
-      }
-
-      return res.status(400).json({ msg: "Uno de los datos ya existe en el sistema." });
+      const msg = error.sqlMessage.toLowerCase();
+      if (msg.includes('email')) return res.status(400).json({ msg: "Correo duplicado." });
+      if (msg.includes('usuario')) return res.status(400).json({ msg: "Usuario duplicado." });
     }
 
-    // --- EXCEPCIÓN 2: Error de Columna o Sintaxis (MySQL Error 1054 / 1146) ---
-    if (error.errno === 1054 || error.errno === 1146) {
-      console.error("CRÍTICO: Error de estructura en la DB:", error.sqlMessage);
-      return res.status(500).json({
-        msg: "Error técnico: La estructura de la base de datos no coincide con el modelo."
-      });
-    }
-
-    // --- EXCEPCIÓN 3: Errores de Validación de Triggers (MySQL Error 1644) ---
     if (error.errno === 1644 || error.sqlState === '45000') {
       return res.status(400).json({ msg: error.sqlMessage });
     }
 
-    // --- EXCEPCIÓN GENÉRICA ---
-    res.status(500).json({
-      error: "Error interno del servidor",
-      detalles: error.message
-    });
+    res.status(500).json({ msg: "Error en la actualización." });
   }
 };
