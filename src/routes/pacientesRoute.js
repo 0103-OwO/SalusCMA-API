@@ -16,6 +16,7 @@ router.put('/:id',verificarToken, ctrl.updatePaciente);
 router.delete('/:id',verificarToken, ctrl.deletePaciente);
 
 router.post('/',verificarToken, ctrl.createPaciente);
+router.post('/crear-public', ctrl.createPaciente);
 router.get('/',verificarToken, ctrl.getPacientes);
 
 export default router;
