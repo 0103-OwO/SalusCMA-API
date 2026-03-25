@@ -85,3 +85,23 @@ export const createPacienteCompleto = async (datos) => {
   return result;
 };
 
+export const getPacienteFullProfile = async (id_usuario) => {
+    const query = `
+        SELECT 
+            p.id_pacientes,
+            p.curp,
+            p.nombre,
+            p.apellido_paterno,
+            p.apellido_materno,
+            p.sexo,
+            p.fecha_nacimiento,
+            u.usuario,
+            u.email -- Aquí es donde traemos el correo de la tabla usuarios_clientes
+        FROM pacientes p
+        INNER JOIN usuarios_clientes u ON p.id_usuario_cliente = u.id_usuario_cliente
+        WHERE u.id_usuario_cliente = ?
+    `;
+    const [rows] = await db.query(query, [id_usuario]);
+    return rows[0]; 
+};
+
