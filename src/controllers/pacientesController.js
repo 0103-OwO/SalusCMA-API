@@ -97,44 +97,71 @@ export const deletePaciente = async (req, res) => {
 };
 
 export const obtenerPerfilPaciente = async (req, res) => {
-    console.log("=== DEBUG: Iniciando obtenerPerfilPaciente ===");
-    
+  try {
+    const id_usuario = req.usuario.id;
+
+    const paciente = await model.getPacienteFullProfile(id_usuario);
+
+    if (!paciente) {
+      return res.status(404).json({ msg: "Paciente no encontrado" });
+    }
+
+    res.json(paciente);
+  } catch (error) {
+    console.error("Error en obtenerPerfilPaciente:", error);
+    res.status(500).json({ error: "Error al obtener los datos del perfil" });
+  }
+};
+
+export const updatePacientePerfil = async (req, res) => {
+    const { id } = req.params;
+
     try {
-        // 1. Verificar si el middleware inyectó el usuario
-        if (!req.usuario) {
-            console.error("❌ ERROR: req.usuario es undefined. Revisa el middleware verificarToken.");
-            return res.status(401).json({ msg: "Token no válido o no proporcionado" });
+        // Ejecutar la actualización (usando el modelo que separa las tablas)
+        await model.updatePacienteYUsuario(id, req.body);
+
+        res.json({ 
+            success: true, 
+            msg: "Perfil actualizado correctamente." 
+        });
+
+    } catch (error) {
+        console.error("DEBUG - Error en updatePaciente:", error);
+
+        // --- EXCEPCIÓN 1: Entradas Duplicadas (MySQL Error 1062) ---
+        if (error.errno === 1062) {
+            const campoDuplicado = error.sqlMessage;
+            
+            if (campoDuplicado.includes('curp')) {
+                return res.status(400).json({ msg: "La CURP ya está registrada por otro paciente." });
+            }
+            if (campoDuplicado.includes('email')) {
+                return res.status(400).json({ msg: "Este correo electrónico ya está en uso." });
+            }
+            if (campoDuplicado.includes('usuario')) {
+                return res.status(400).json({ msg: "El nombre de usuario no está disponible." });
+            }
+            
+            return res.status(400).json({ msg: "Uno de los datos ya existe en el sistema." });
         }
 
-        const id_usuario_cliente = req.usuario.id;
-        console.log(`🔍 Buscando perfil para id_usuario_cliente: ${id_usuario_cliente}`);
-
-        // 2. Llamada al modelo
-        const paciente = await model.getPacienteFullProfile(id_usuario_cliente);
-
-        // 3. Verificar si el modelo retornó algo
-        if (!paciente) {
-            console.warn(`⚠️ ADVERTENCIA: No se encontró registro en la DB para el ID: ${id_usuario_cliente}`);
-            return res.status(404).json({ 
-                msg: "Perfil no encontrado",
-                debug_id: id_usuario_cliente 
+        // --- EXCEPCIÓN 2: Error de Columna o Sintaxis (MySQL Error 1054 / 1146) ---
+        if (error.errno === 1054 || error.errno === 1146) {
+            console.error("CRÍTICO: Error de estructura en la DB:", error.sqlMessage);
+            return res.status(500).json({ 
+                msg: "Error técnico: La estructura de la base de datos no coincide con el modelo." 
             });
         }
 
-        console.log("✅ Perfil encontrado exitosamente:", paciente.nombre);
-        res.json(paciente);
+        // --- EXCEPCIÓN 3: Errores de Validación de Triggers (MySQL Error 1644) ---
+        if (error.errno === 1644 || error.sqlState === '45000') {
+            return res.status(400).json({ msg: error.sqlMessage });
+        }
 
-    } catch (error) {
-        // 4. Capturar el error exacto de SQL o JS
-        console.error("████████ ERROR CRÍTICO EN PERFIL ████████");
-        console.error("Mensaje:", error.message);
-        console.error("Stack:", error.stack);
-        
+        // --- EXCEPCIÓN GENÉRICA ---
         res.status(500).json({ 
-            error: "Error interno al obtener perfil",
+            error: "Error interno del servidor",
             detalles: error.message 
         });
-    } finally {
-        console.log("=== DEBUG: Fin de la petición ===");
     }
 };

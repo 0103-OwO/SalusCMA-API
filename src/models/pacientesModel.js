@@ -104,3 +104,25 @@ export const getPacienteFullProfile = async (id_usuario_cliente) => {
   const [rows] = await db.query(query, [id_usuario_cliente]);
   return rows[0];
 };
+
+export const updatePacienteYUsuario = async (id_paciente, datos) => {
+    const { curp, nombre, apellido_paterno, apellido_materno, sexo, fecha_nacimiento } = datos;
+    
+    const { email, usuario } = datos;
+
+    const queryPacientes = `
+        UPDATE pacientes 
+        SET curp = ?, nombre = ?, apellido_paterno = ?, apellido_materno = ?, sexo = ?, fecha_nacimiento = ?
+        WHERE id_pacientes = ?`;
+    
+    await db.query(queryPacientes, [curp, nombre, apellido_paterno, apellido_materno, sexo, fecha_nacimiento, id_paciente]);
+
+    const queryUsuarios = `
+        UPDATE usuarios_clientes 
+        SET email = ?, usuario = ? 
+        WHERE id_paciente = ?`;
+    
+    await db.query(queryUsuarios, [email, usuario, id_paciente]);
+
+    return { id_paciente, success: true };
+};
