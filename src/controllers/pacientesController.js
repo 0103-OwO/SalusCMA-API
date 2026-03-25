@@ -97,11 +97,18 @@ export const deletePaciente = async (req, res) => {
 };
 
 export const obtenerPerfilPaciente = async (req, res) => {
-    try {
-        const id = req.usuario.id; 
-        const paciente = await model.getPacienteById(id); 
-        res.json(paciente);
-    } catch (error) {
-        res.status(500).json({ error: "Error al obtener perfil" });
+  try {
+    const id_usuario = req.usuario.id;
+
+    const paciente = await model.getPacienteFullProfile(id_usuario);
+
+    if (!paciente) {
+      return res.status(404).json({ msg: "Paciente no encontrado" });
     }
+
+    res.json(paciente);
+  } catch (error) {
+    console.error("Error en obtenerPerfilPaciente:", error);
+    res.status(500).json({ error: "Error al obtener los datos del perfil" });
+  }
 };
