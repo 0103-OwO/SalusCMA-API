@@ -23,19 +23,22 @@ export const createPaciente = async (req, res) => {
   try {
     const { curp, usuario, contrasena } = req.body;
 
+    // 1. Validaciones manuales
     const existeCurp = await model.checkCurpExists(curp);
     if (existeCurp) {
       return res.status(400).json({ msg: "La CURP ya se encuentra registrada." });
     }
 
-    const existeUsuario = await model.checkUserExists(usuario); 
+    const existeUsuario = await model.checkUserExists(usuario);
     if (existeUsuario) {
       return res.status(400).json({ msg: "El nombre de usuario ya está en uso." });
     }
 
+    // 2. Hash de contraseña
     const salt = await bcrypt.genSalt(10);
     const hashContrasena = await bcrypt.hash(contrasena, salt);
 
+    // 3. Intento de inserción
     await model.createPacienteCompleto({
       ...req.body,
       contrasena: hashContrasena
@@ -44,13 +47,36 @@ export const createPaciente = async (req, res) => {
     res.status(201).json({ msg: "Paciente y usuario registrados con éxito." });
 
   } catch (error) {
-    console.error("Fallo en el registro:", error);
+    // --- SECCIÓN DE LOGS CRÍTICOS ---
+    console.error("********** ERROR DE REGISTRO DETECTADO **********");
+    console.error("Código Error (code):", error.code);     // Ej: ER_CANT_AGGREGATE_2COLLATIONS
+    console.error("Número Error (errno):", error.errno);   // Ej: 1267
+    console.error("Estado SQL (sqlState):", error.sqlState);
+    console.error("Mensaje MySQL:", error.sqlMessage);     // El texto real del error
+    console.error("Stack Trace:", error.stack);            // Dónde falló el archivo JS
+    console.error("*************************************************");
 
+    // Respuesta inteligente basada en el error capturado
     if (error.sqlState === '45000' || error.code === 'ER_SIGNAL_EXCEPTION') {
-      return res.status(400).json({ msg: error.sqlMessage || error.message });
+      return res.status(400).json({
+        success: false,
+        msg: error.sqlMessage
+      });
     }
 
-    res.status(500).json({ error: "Error interno del servidor al registrar." });
+    // Si el error es de Collation (el que tenías antes)
+    if (error.code === 'ER_CANT_AGGREGATE_2COLLATIONS') {
+      return res.status(500).json({
+        error: "Conflicto de colaciones en la DB",
+        detalle: "Asegúrate de que 'pacientes' y 'usuarios_clientes' usen utf8mb4_unicode_ci"
+      });
+    }
+
+    // Respuesta genérica 500 pero con el detalle técnico para que lo veas en el navegador
+    res.status(500).json({
+      error: "Error interno del servidor",
+      debug: error.sqlMessage || error.message
+    });
   }
 };
 
