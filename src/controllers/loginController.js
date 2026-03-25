@@ -9,7 +9,7 @@ export const login = async (req, res) => {
         const user = await buscarUsuarioGlobal(identificador);
 
         if (!user) {
-            return res.status(401).json({ success: false, error: 'Usuario no encontrado' });
+            return res.status(401).json({ success: false, error: 'Credenciales incorrectas' });
         }
 
         const hashCompatible = user.contrasena.replace(/^\$2y\$/, '$2a$');
