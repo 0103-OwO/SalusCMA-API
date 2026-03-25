@@ -97,18 +97,44 @@ export const deletePaciente = async (req, res) => {
 };
 
 export const obtenerPerfilPaciente = async (req, res) => {
-  try {
-    const id_usuario = req.usuario.id;
+    console.log("=== DEBUG: Iniciando obtenerPerfilPaciente ===");
+    
+    try {
+        // 1. Verificar si el middleware inyectó el usuario
+        if (!req.usuario) {
+            console.error("❌ ERROR: req.usuario es undefined. Revisa el middleware verificarToken.");
+            return res.status(401).json({ msg: "Token no válido o no proporcionado" });
+        }
 
-    const paciente = await model.getPacienteFullProfile(id_usuario);
+        const id_usuario_cliente = req.usuario.id;
+        console.log(`🔍 Buscando perfil para id_usuario_cliente: ${id_usuario_cliente}`);
 
-    if (!paciente) {
-      return res.status(404).json({ msg: "Paciente no encontrado" });
+        // 2. Llamada al modelo
+        const paciente = await model.getPacienteFullProfile(id_usuario_cliente);
+
+        // 3. Verificar si el modelo retornó algo
+        if (!paciente) {
+            console.warn(`⚠️ ADVERTENCIA: No se encontró registro en la DB para el ID: ${id_usuario_cliente}`);
+            return res.status(404).json({ 
+                msg: "Perfil no encontrado",
+                debug_id: id_usuario_cliente 
+            });
+        }
+
+        console.log("✅ Perfil encontrado exitosamente:", paciente.nombre);
+        res.json(paciente);
+
+    } catch (error) {
+        // 4. Capturar el error exacto de SQL o JS
+        console.error("████████ ERROR CRÍTICO EN PERFIL ████████");
+        console.error("Mensaje:", error.message);
+        console.error("Stack:", error.stack);
+        
+        res.status(500).json({ 
+            error: "Error interno al obtener perfil",
+            detalles: error.message 
+        });
+    } finally {
+        console.log("=== DEBUG: Fin de la petición ===");
     }
-
-    res.json(paciente);
-  } catch (error) {
-    console.error("Error en obtenerPerfilPaciente:", error);
-    res.status(500).json({ error: "Error al obtener los datos del perfil" });
-  }
 };
