@@ -35,6 +35,10 @@ export const login = async (req, res) => {
         const token = jwt.sign(
             {
                 id: user.id_referencia || user.id_interno,
+
+                id_cuenta: user.id_usuario_cliente || user.id_interno,
+                id_referencia: user.id_referencia,
+
                 rol: user.id_rol,
                 nombre: nombreReal,
                 tipo: user.tipo_usuario
