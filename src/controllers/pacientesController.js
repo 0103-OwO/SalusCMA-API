@@ -99,28 +99,33 @@ export const deletePaciente = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-
+// controllers/pacientesController.js
 export const obtenerPerfilPaciente = async (req, res) => {
   try {
-    // Si pasas :id en la URL, usa ese. Si no, usa el del Token.
-    const idPaciente = req.params.id || req.usuario.id_referencia;
+    // Verificamos si req.usuario existe antes de pedir id_referencia
+    const idDesdeToken = req.usuario ? req.usuario.id_referencia : null;
+    const idDesdeParams = req.params.id;
 
-    console.log("Buscando paciente con ID:", idPaciente); // Mira esto en tu terminal
+    const idPaciente = idDesdeParams || idDesdeToken;
+
+    console.log("ID obtenido:", idPaciente);
 
     if (!idPaciente) {
-      return res.status(400).json({ msg: "ID no proporcionado" });
+      return res.status(401).json({
+        msg: "No se pudo identificar al usuario. Por favor, inicie sesión nuevamente."
+      });
     }
 
     const data = await model.getPacienteFullProfile(idPaciente);
 
     if (!data) {
-      return res.status(404).json({ msg: "Paciente no existe en la base de datos" });
+      return res.status(404).json({ msg: "Paciente no encontrado en la base de datos." });
     }
 
     res.json(data);
   } catch (error) {
-    console.error("ERROR EN MODELO:", error);
-    res.status(500).json({ msg: "Error interno del servidor" });
+    console.error("ERROR EN CONTROLADOR:", error);
+    res.status(500).json({ msg: "Error interno del servidor." });
   }
 };
 

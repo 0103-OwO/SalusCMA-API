@@ -32,13 +32,12 @@ export const login = async (req, res) => {
             nombreReal = t ? t.nombre : 'Empleado';
         }
 
+        const idFinal = user.id_referencia || user.id_paciente || user.id_trabajador;
+
         const token = jwt.sign(
             {
-                id: user.id_referencia || user.id_interno,
-
-                id_cuenta: user.id_usuario_cliente || user.id_interno,
-                id_referencia: user.id_referencia,
-
+                id_referencia: idFinal,
+                id_cuenta: user.id_usuario_cliente || user.id_usuario || user.id_interno,
                 rol: user.id_rol,
                 nombre: nombreReal,
                 tipo: user.tipo_usuario
@@ -46,6 +45,8 @@ export const login = async (req, res) => {
             process.env.JWT_SECRET,
             { expiresIn: '8h' }
         );
+
+        console.log("Token generado para ID:", idFinal);
 
         res.json({
             success: true,
