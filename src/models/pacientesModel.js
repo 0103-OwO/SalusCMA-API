@@ -1,7 +1,19 @@
 import db from '../config/db.js';
 
-export const checkCurpExists = async (curp) => {
+export const checkCurpExists = async (curp, id = null) => {
+  if (id) {
+    const [result] = await db.query(
+      'SELECT COUNT(*) as count FROM pacientes WHERE curp = ? AND id_pacientes != ?',
+      [curp, id]
+    );
+    return result[0].count > 0;
+  }
   const [result] = await db.query('SELECT fn_curp_existe(?) AS existe', [curp]);
+  return result[0].existe === 1;
+};
+
+export const checkUserExists = async (usuario) => {
+  const [result] = await db.query('SELECT fn_usuario_existe(?) AS existe', [usuario]);
   return result[0].existe === 1;
 };
 
