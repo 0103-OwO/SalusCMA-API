@@ -95,3 +95,13 @@ export const deletePaciente = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+export const obtenerPerfilPaciente = async (req, res) => {
+    try {
+        const id = req.usuario.id; 
+        const paciente = await model.getPacienteById(id); 
+        res.json(paciente);
+    } catch (error) {
+        res.status(500).json({ error: "Error al obtener perfil" });
+    }
+};

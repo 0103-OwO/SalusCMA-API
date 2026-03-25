@@ -4,6 +4,8 @@ import { verificarToken } from '../middleware/authMiddleware.js';
 
 const router = Router();
 
+router.get('/perfil', verificarToken, ctrl.obtenerPerfilPaciente);
+
 router.get('/',verificarToken, ctrl.getPacientes);
 router.get('/:id',verificarToken, ctrl.getPaciente);
 
