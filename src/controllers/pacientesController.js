@@ -102,28 +102,25 @@ export const deletePaciente = async (req, res) => {
 
 export const obtenerPerfilPaciente = async (req, res) => {
   try {
-    const { id, tipo } = req.usuario;
-
-    if (tipo !== 'cliente') {
-      return res.status(403).json({ msg: "Acceso denegado. Este perfil es solo para pacientes." });
-    }
+    const idUsuario = req.usuario.id;
 
     const query = `
-            SELECT p.*, u.email, u.usuario
-            FROM pacientes p
-            INNER JOIN usuarios_clientes u ON u.id_paciente = p.id_pacientes
-            WHERE p.id_pacientes = ?`;
+            SELECT p.*, u.email, u.usuario, u.id_usuario_cliente
+            FROM usuarios_clientes u
+            INNER JOIN pacientes p ON u.id_paciente = p.id_pacientes
+            WHERE u.id_usuario_cliente = ?`;
 
-    const [rows] = await db.query(query, [id]);
+    const [rows] = await db.query(query, [idUsuario]);
 
     if (rows.length === 0) {
-      return res.status(404).json({ msg: "No se encontraron datos para este paciente." });
+      console.log("No se encontro relacion para el ID de usuario:", idUsuario);
+      return res.status(404).json({ msg: "No se encontraron datos vinculados." });
     }
 
     res.json(rows[0]);
   } catch (error) {
-    console.error("Error al obtener perfil:", error);
-    res.status(500).json({ msg: "Error interno del servidor" });
+    console.error("Error exacto en el servidor:", error);
+    res.status(500).json({ msg: "Error interno al obtener perfil." });
   }
 };
 
