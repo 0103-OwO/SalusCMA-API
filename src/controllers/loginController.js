@@ -32,19 +32,9 @@ export const login = async (req, res) => {
             nombreReal = t ? t.nombre : 'Empleado';
         }
 
-        const idReferenciaValido = user.id_referencia || user.id_paciente || user.id_trabajador;
-
-        if (!idReferenciaValido) {
-            console.error("ERROR: El usuario existe pero no tiene un ID de referencia asociado.", user);
-            return res.status(500).json({
-                success: false,
-                error: 'Error de configuración de cuenta: ID de referencia no encontrado.'
-            });
-        }
         const token = jwt.sign(
             {
-                id_referencia: idReferenciaValido,
-                id_cuenta: user.id_usuario_cliente || user.id_usuario || user.id_interno,
+                id: user.id_referencia || user.id_interno,
                 rol: user.id_rol,
                 nombre: nombreReal,
                 tipo: user.tipo_usuario
@@ -52,8 +42,6 @@ export const login = async (req, res) => {
             process.env.JWT_SECRET,
             { expiresIn: '8h' }
         );
-
-        console.log("Token generado para ID:", idFinal);
 
         res.json({
             success: true,

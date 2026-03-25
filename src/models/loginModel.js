@@ -1,36 +1,8 @@
 import db from '../config/db.js';
 
 export const buscarUsuarioGlobal = async (identificador) => {
-    const query = `
-        SELECT 
-            id_usuario_cliente AS id_usuario_tabla,
-            usuario,
-            contrasena,
-            id_rol,
-            id_paciente AS id_referencia, 
-            'cliente' AS tipo_usuario
-        FROM usuarios_clientes
-        WHERE usuario = ? OR email = ?
-        
-        UNION
-        
-        SELECT 
-            id_usuario AS id_usuario_tabla,
-            usuario,
-            contrasena,
-            id_rol,
-            id_trabajador AS id_referencia,
-            'interno' AS tipo_usuario
-        FROM usuario
-        WHERE usuario = ?`;
-
-    try {
-        const [rows] = await db.query(query, [identificador, identificador, identificador]);
-        return rows[0]; 
-    } catch (error) {
-        console.error("Error en buscarUsuarioGlobal:", error);
-        throw error;
-    }
+    const [result] = await db.query('CALL sp_login_usuario(?)', [identificador]);
+    return result[0][0]; 
 };
 
 export const getNombrePaciente = async (id) => {
