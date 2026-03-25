@@ -8,7 +8,7 @@ router.get('/perfil', verificarToken, ctrl.obtenerPerfilPaciente);
 
 router.put('/:id', verificarToken, ctrl.updatePacientePerfil);
 
-router.get('/',verificarToken, ctrl.getPacientes);
+router.get('/:id',verificarToken, ctrl.getPacientes);
 router.get('/:id',verificarToken, ctrl.getPaciente);
 
 router.post('/',verificarToken, ctrl.createPaciente);
