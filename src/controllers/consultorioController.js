@@ -77,10 +77,35 @@ export const actualizar = async (req, res) => {
 
 export const eliminar = async (req, res) => {
   const { id } = req.params;
+
   try {
     await consultorioModel.deleteConsultorio(id);
-    res.json({ success: true, message: 'Consultorio eliminado' });
+
+    return res.status(200).json({
+      success: true,
+      message: 'Consultorio eliminado correctamente'
+    });
+
   } catch (error) {
-    res.status(500).json({ error: 'Error al eliminar' });
+    console.error("Error en DB:", error.errno, error.sqlMessage);
+
+    if (error.errno === 1644) {
+      return res.status(400).json({
+        success: false,
+        error: error.sqlMessage
+      });
+    }
+
+    if (error.errno === 1451) {
+      return res.status(400).json({
+        success: false,
+        error: 'No se puede eliminar: este registro está vinculado a otra tabla.'
+      });
+    }
+
+    return res.status(500).json({
+      success: false,
+      error: 'Ocurrió un error inesperado en el servidor.'
+    });
   }
 };

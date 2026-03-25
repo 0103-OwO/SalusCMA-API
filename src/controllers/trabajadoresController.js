@@ -30,7 +30,7 @@ export const crear = async (req, res) => {
       return new Promise((resolve, reject) => {
         const stream = cloudinary.uploader.upload_stream(
           {
-            folder: 'salus_cma/trabajadores', 
+            folder: 'salus_cma/trabajadores',
             resource_type: 'image'
           },
           (error, result) => {
@@ -103,24 +103,48 @@ export const actualizar = async (req, res) => {
 };
 
 export const eliminar = async (req, res) => {
+  const { id } = req.params;
+
   try {
-    await trabajadorModel.deleteTrabajador(req.params.id);
-    res.json({ message: 'Eliminado correctamente' });
+    await trabajadorModel.deleteTrabajador(id);
+
+    res.json({
+      success: true,
+      message: 'Trabajador eliminado correctamente'
+    });
+
   } catch (error) {
-    res.status(500).json({ error: 'Error al eliminar' });
+    console.error("Error al eliminar trabajador:", error.errno);
+
+    if (error.errno === 1644) {
+      return res.status(400).json({
+        success: false,
+        error: error.sqlMessage
+      });
+    }
+    if (error.errno === 1451) {
+      return res.status(400).json({
+        success: false,
+        error: 'No se puede eliminar: el trabajador tiene un usuario o registros vinculados.'
+      });
+    }
+    res.status(500).json({
+      success: false,
+      error: 'Error interno al procesar la eliminación'
+    });
   }
 };
 
 export const obtenerMedicosCitas = async (req, res) => {
-    try {
-        const medicos = await trabajadorModel.getMedicos(); 
-        
-        if (medicos.length === 0) {
-            return res.status(404).json({ message: "No se encontraron médicos con rol activo" });
-        }
-        res.json(medicos);
-    } catch (error) {
-        console.error("Error en obtenerMedicosCitas:", error); 
-        res.status(500).json({ error: "Error al obtener la lista de médicos" });
+  try {
+    const medicos = await trabajadorModel.getMedicos();
+
+    if (medicos.length === 0) {
+      return res.status(404).json({ message: "No se encontraron médicos con rol activo" });
     }
+    res.json(medicos);
+  } catch (error) {
+    console.error("Error en obtenerMedicosCitas:", error);
+    res.status(500).json({ error: "Error al obtener la lista de médicos" });
+  }
 };
