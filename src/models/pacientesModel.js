@@ -91,23 +91,23 @@ export const createPacienteCompleto = async (datos) => {
   return { id_paciente, success: true };
 };
 
-export const getPacienteFullProfile = async (id_usuario_cliente) => {
+export const getPacienteFullProfile = async (id_paciente) => {
   const query = `
         SELECT 
-            p.id_pacientes,
-            p.curp,
-            p.nombre,
-            p.apellido_paterno,
-            p.apellido_materno,
-            p.sexo,
+            p.id_pacientes, 
+            p.curp, 
+            p.nombre, 
+            p.apellido_paterno, 
+            p.apellido_materno, 
+            p.sexo, 
             p.fecha_nacimiento,
-            u.usuario,
-            u.email
+            u.email, 
+            u.usuario
         FROM pacientes p
-        INNER JOIN usuarios_clientes u ON p.id_pacientes = u.id_paciente
-        WHERE u.id_usuario_cliente = ?
-    `;
-  const [rows] = await db.query(query, [id_usuario_cliente]);
+        INNER JOIN usuarios_clientes u ON u.id_paciente = p.id_pacientes
+        WHERE p.id_pacientes = ?`;
+
+  const [rows] = await db.query(query, [id_paciente]);
   return rows[0];
 };
 

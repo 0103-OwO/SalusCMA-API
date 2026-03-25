@@ -102,27 +102,23 @@ export const deletePaciente = async (req, res) => {
 
 export const obtenerPerfilPaciente = async (req, res) => {
   try {
+    
     const idPaciente = req.usuario.id_referencia;
 
     if (!idPaciente) {
-      return res.status(404).json({ msg: "No tienes un paciente vinculado a esta cuenta." });
+      return res.status(404).json({ msg: "No se encontró un ID de paciente en la sesión." });
     }
 
-    const query = `
-            SELECT p.*, u.email, u.usuario
-            FROM pacientes p
-            INNER JOIN usuarios_clientes u ON u.id_paciente = p.id_pacientes
-            WHERE p.id_pacientes = ?`;
+    const data = await model.getPacienteFullProfile(idPaciente);
 
-    const [rows] = await db.query(query, [idPaciente]);
-
-    if (rows.length === 0) {
-      return res.status(404).json({ msg: "Datos no encontrados." });
+    if (!data) {
+      return res.status(404).json({ msg: "No se encontraron datos del perfil." });
     }
 
-    res.json(rows[0]);
+    res.json(data);
   } catch (error) {
-    res.status(500).json({ msg: "Error al cargar el perfil." });
+    console.error(error);
+    res.status(500).json({ msg: "Error al obtener la información del servidor." });
   }
 };
 

@@ -4,15 +4,18 @@ import { verificarToken } from '../middleware/authMiddleware.js';
 
 const router = Router();
 
-router.get('/mi-perfil',ctrl.obtenerPerfilPaciente);
+router.get('/perfil',ctrl.obtenerPerfilPaciente);
 
 router.put('/actualizar-perfil', verificarToken, ctrl.updatePacientePerfil);
 
-router.get('/',verificarToken, ctrl.getPacientes);
+
 router.get('/:id',verificarToken, ctrl.getPaciente);
 
-router.post('/',verificarToken, ctrl.createPaciente);
+
 router.put('/:id',verificarToken, ctrl.updatePaciente);
 router.delete('/:id',verificarToken, ctrl.deletePaciente);
+
+router.post('/',verificarToken, ctrl.createPaciente);
+router.get('/',verificarToken, ctrl.getPacientes);
 
 export default router;
