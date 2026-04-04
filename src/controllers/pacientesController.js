@@ -181,22 +181,22 @@ export const actualizarDatosPerfil = async (req, res) => {
         const { curp, nombre, app, apm, fecha_nac, correo, sexo, usuario } = req.body;
 
         //Validar CURP
-        if (await usuarioModel.checkCurpExists(curp, idPaciente)) {
+        if (await model.checkCurpExists(curp, idPaciente)) {
             return res.status(400).json({ success: false, error: 'La CURP ya existe.' });
         }
 
         //Validar Correo
-        if (await usuarioModel.checkEmailExistsUpdate(correo, idPaciente)) {
+        if (await model.checkEmailExistsUpdate(correo, idPaciente)) {
             return res.status(400).json({ success: false, error: 'El correo ya existe.' });
         }
 
         //Validar Usuario (La nueva aduana)
-        if (await usuarioModel.checkUserExistsUpdate(usuario, idPaciente)) {
+        if (await model.checkUserExistsUpdate(usuario, idPaciente)) {
             return res.status(400).json({ success: false, error: 'El nombre de usuario ya existe.' });
         }
 
         // Si todo está bien, actualizamos las dos tablas
-        const exito = await usuarioModel.actualizarPerfilCompletoPaciente(idPaciente, {
+        const exito = await model.actualizarPerfilCompletoPaciente(idPaciente, {
             curp, nombre, app, apm, fecha_nac, correo, sexo, usuario
         });
 
