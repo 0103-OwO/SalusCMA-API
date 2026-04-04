@@ -101,29 +101,33 @@ export const deletePaciente = async (req, res) => {
 }; 
 
 export const obtenerPerfilPaciente = async (req, res) => {
-  try {
-    // Extraemos el ID del token (validado por el middleware)
-    // Asegúrate de que en tu login guardaste el 'id_pacientes' en el token
-    const idPaciente = req.user.id;
+    try {
+        // CAMBIO: Usamos 'usuario' porque así lo definió tu middleware
+        if (!req.usuario) {
+            return res.status(401).json({ success: false, error: 'No se encontró información de usuario' });
+        }
 
-    const perfil = await usuarioModel.getPacienteFullProfile(idPaciente);
+        const idPaciente = req.usuario.id; 
 
-    if (!perfil) {
-      return res.status(404).json({
-        success: false,
-        error: 'No se encontraron datos para este paciente.'
-      });
+        // Tu modelo que ya definimos
+        const perfil = await usuarioModel.getPacienteFullProfile(idPaciente);
+
+        if (!perfil) {
+            return res.status(404).json({ 
+                success: false, 
+                error: 'No se encontraron datos para este paciente.' 
+            });
+        }
+
+        res.json({
+            success: true,
+            datos: perfil
+        });
+
+    } catch (error) {
+        console.error("Error al obtener perfil:", error);
+        res.status(500).json({ success: false, error: 'Error interno del servidor' });
     }
-
-    res.json({
-      success: true,
-      datos: perfil
-    });
-
-  } catch (error) {
-    console.error("Error al obtener perfil:", error);
-    res.status(500).json({ success: false, error: 'Error interno del servidor' });
-  }
 };
 
 export const updatePacientePerfil = async (req, res) => {
