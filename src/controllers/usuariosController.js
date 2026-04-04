@@ -109,7 +109,7 @@ export const solicitarRecuperacion = async (req, res) => {
 
     // Construir el link (ajusta a tu ruta de frontend)
     // Pasamos el ID y el Token en la URL
-    const link = `https://0103-owo.github.io/SalusCMA-APP/restablecerContrasena.html?id=${usuario.id}&token=${token}&tipo=${usuario.tipo}`;
+    const link = `https://0103-owo.github.io/SalusCMA-APP/html/restablecerContrasena.html?id=${usuario.id}&token=${token}&tipo=${usuario.tipo}`;
 
     //Enviar el email con Resend
     await emailRecuperacion({
