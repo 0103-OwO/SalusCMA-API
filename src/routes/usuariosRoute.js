@@ -11,4 +11,7 @@ router.post('/',verificarToken, usuarios.crear);
 router.put('/:id',verificarToken, usuarios.actualizar);
 router.delete('/:id', verificarToken, usuarios.eliminar);
 
+router.post('/solicitar-recuperacion', usuarios.solicitarRecuperacion);
+router.post('/restablecer-password', usuarios.restablecerPassword);
+
 export default router;

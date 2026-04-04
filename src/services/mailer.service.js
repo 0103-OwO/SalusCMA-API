@@ -46,3 +46,20 @@ export async function emailContacto({ nombre, telefono, email, mensaje }) {
     `
   });
 }
+
+export async function emailRecuperacion({ email, nombre, link }) {
+  return sendEmail({
+    to: email,
+    subject: "Restablecer tu contraseña — Salus CMA",
+    html: `
+      <div style="font-family:Arial,sans-serif;max-width:520px;padding:20px;border:1px solid #eee;border-radius:10px">
+        <h2 style="color:#333">Hola, ${nombre}</h2>
+        <p>Recibimos una solicitud para restablecer tu contraseña. Haz clic en el siguiente botón para continuar:</p>
+        <div style="text-align:center;margin:30px 0">
+          <a href="${link}" style="background-color:#007bff;color:white;padding:12px 25px;text-decoration:none;border-radius:5px;font-weight:bold">Restablecer Contraseña</a>
+        </div>
+        <p style="font-size:12px;color:#777">Este enlace expirará en 1 hora. Si no solicitaste este cambio, puedes ignorar este correo.</p>
+      </div>
+    `
+  });
+}

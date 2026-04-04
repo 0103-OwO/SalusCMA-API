@@ -52,3 +52,28 @@ export const deleteUsuario = async (id) => {
   );
   return { message: 'Usuario eliminado' };
 };
+
+// Busca por correo en ambas tablas 
+export const buscarUsuarioPorCorreo = async (email) => {
+    const [cliente] = await db.query('SELECT id_usuario_cliente AS id, email, contrasena AS password, "cliente" AS tipo FROM usuarios_clientes WHERE email = ?', [email]);
+    if (cliente.length > 0) return cliente[0];
+
+    const [interno] = await db.query('SELECT u.id_usuario AS id, t.correo AS email, u.contrasena AS password, "interno" AS tipo FROM usuario u JOIN trabajadores t ON u.id_trabajador = t.id_trabajador WHERE t.correo = ?', [email]);
+    if (interno.length > 0) return interno[0];
+    return null;
+};
+
+// Busca por ID y Tipo para validar el JWT
+export const buscarUsuarioPorIdYTipo = async (id, tipo) => {
+    const tabla = tipo === 'cliente' ? 'usuarios_clientes' : 'usuario';
+    const idCol = tipo === 'cliente' ? 'id_usuario_cliente' : 'id_usuario';
+    const [rows] = await db.query(`SELECT * FROM ${tabla} WHERE ${idCol} = ?`, [id]);
+    return rows[0];
+};
+
+// Actualiza la contraseña
+export const actualizarPasswordPorTipo = async (id, tipo, password) => {
+    const tabla = tipo === 'cliente' ? 'usuarios_clientes' : 'usuario';
+    const idCol = tipo === 'cliente' ? 'id_usuario_cliente' : 'id_usuario';
+    return await db.query(`UPDATE ${tabla} SET contrasena = ? WHERE ${idCol} = ?`, [password, id]);
+};
