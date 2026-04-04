@@ -6,7 +6,7 @@ const router = Router();
 
 router.get('/perfil-paciente', verificarToken, ctrl.obtenerPerfilPaciente);
 
-router.put('/actualizar-perfil', verificarToken, ctrl.updatePacientePerfil);
+router.put('/actualizar-perfil', verificarToken, ctrl.actualizarDatosPerfil);
 
 
 router.get('/:id', verificarToken, ctrl.getPaciente);

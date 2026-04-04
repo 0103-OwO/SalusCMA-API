@@ -175,3 +175,38 @@ export const updatePacientePerfil = async (req, res) => {
   }
 };
 
+export const actualizarDatosPerfil = async (req, res) => {
+    try {
+        const idPaciente = req.usuario.id;
+        const { curp, nombre, app, apm, fecha_nac, correo, sexo, usuario } = req.body;
+
+        //Validar CURP
+        if (await usuarioModel.checkCurpExists(curp, idPaciente)) {
+            return res.status(400).json({ success: false, error: 'La CURP ya existe.' });
+        }
+
+        //Validar Correo
+        if (await usuarioModel.checkEmailExistsUpdate(correo, idPaciente)) {
+            return res.status(400).json({ success: false, error: 'El correo ya existe.' });
+        }
+
+        //Validar Usuario (La nueva aduana)
+        if (await usuarioModel.checkUserExistsUpdate(usuario, idPaciente)) {
+            return res.status(400).json({ success: false, error: 'El nombre de usuario ya existe.' });
+        }
+
+        // Si todo está bien, actualizamos las dos tablas
+        const exito = await usuarioModel.actualizarPerfilCompletoPaciente(idPaciente, {
+            curp, nombre, app, apm, fecha_nac, correo, sexo, usuario
+        });
+
+        if (exito) {
+            res.json({ success: true, message: '¡Perfil actualizado con éxito!' });
+        }
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, error: 'Error interno al actualizar.' });
+    }
+};
+

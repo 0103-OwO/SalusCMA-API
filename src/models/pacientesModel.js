@@ -17,6 +17,12 @@ export const checkUserExists = async (usuario) => {
   return result[0].existe === 1;
 };
 
+export const checkUserExistsUpdate = async (usuario, idPaciente) => {
+    const query = `SELECT id_paciente FROM usuarios_clientes WHERE usuario = ? AND id_paciente != ?`;
+    const [rows] = await db.query(query, [usuario, idPaciente]);
+    return rows.length > 0;
+};
+
 export const getAllPacientes = async () => {
   const [rows] = await db.query('SELECT * FROM pacientes');
   return rows;
@@ -157,4 +163,46 @@ export const checkEmailExists = async (email) => {
     `;
   const [rows] = await db.query(query, [email]);
   return rows.length > 0;
+};
+
+export const checkEmailExistsUpdate = async (email, idPaciente) => {
+    const query = `
+        SELECT email FROM (
+            SELECT email, id_paciente FROM usuarios_clientes
+            UNION
+            SELECT correo AS email, id_trabajador AS id_paciente FROM trabajadores
+        ) AS todos_los_correos
+        WHERE email = ? AND id_paciente != ? LIMIT 1
+    `;
+    const [rows] = await db.query(query, [email, idPaciente]);
+    return rows.length > 0;
+};
+
+export const actualizarPerfilCompletoPaciente = async (id, datos) => {
+    const connection = await db.getConnection();
+    try {
+        await connection.beginTransaction();
+
+        //Actualizar datos personales en la tabla 'pacientes'
+        await connection.query(
+            `UPDATE pacientes 
+             SET curp = ?, nombre = ?, apellido_paterno = ?, apellido_materno = ?, fecha_nacimiento = ?, sexo = ? 
+             WHERE id_pacientes = ?`,
+            [datos.curp, datos.nombre, datos.app, datos.apm, datos.fecha_nac, datos.sexo, id]
+        );
+
+        //Actualizar el correo en la tabla 'usuarios_clientes'
+        await connection.query(
+            `UPDATE usuarios_clientes SET email = ? WHERE id_paciente = ?`,
+            [datos.correo, id]
+        );
+
+        await connection.commit();
+        return true;
+    } catch (error) {
+        await connection.rollback();
+        throw error;
+    } finally {
+        connection.release();
+    }
 };
