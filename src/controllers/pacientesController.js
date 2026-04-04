@@ -110,7 +110,7 @@ export const obtenerPerfilPaciente = async (req, res) => {
         const idPaciente = req.usuario.id; 
 
         // Tu modelo que ya definimos
-        const perfil = await usuarioModel.getPacienteFullProfile(idPaciente);
+        const perfil = await model.getPacienteFullProfile(idPaciente);
 
         if (!perfil) {
             return res.status(404).json({ 
