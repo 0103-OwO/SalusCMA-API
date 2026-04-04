@@ -11,9 +11,9 @@ export const getAllTrabajadores = async () => {
 
 export const getTrabajadorById = async (id) => {
   const query = `
-    SELECT t.*, e.nombre_especialidad 
+    SELECT t.*, e.especialidad 
     FROM trabajadores t
-    LEFT JOIN especialidades e ON t.id_especialidad = e.id_especialidad
+    LEFT JOIN especialidad e ON t.id_especialidad = e.id_especialidad
     WHERE t.id_trabajador = ?
   `;
   const [rows] = await db.query(query, [id]);
