@@ -10,7 +10,13 @@ export const getAllTrabajadores = async () => {
 };
 
 export const getTrabajadorById = async (id) => {
-  const [rows] = await db.query('SELECT * FROM trabajadores WHERE id_trabajador = ?', [id]);
+  const query = `
+    SELECT t.*, e.nombre_especialidad 
+    FROM trabajadores t
+    LEFT JOIN especialidades e ON t.id_especialidad = e.id_especialidad
+    WHERE t.id_trabajador = ?
+  `;
+  const [rows] = await db.query(query, [id]);
   return rows[0];
 };
 
@@ -30,7 +36,7 @@ export const deleteTrabajador = async (id) => {
 };
 
 export const getMedicos = async () => {
-    const query = `
+  const query = `
         SELECT 
             t.id_trabajador, 
             t.nombre, 
@@ -41,6 +47,6 @@ export const getMedicos = async () => {
         INNER JOIN rol r ON u.id_rol = r.id_rol
         WHERE r.nombre = 'Medico' OR u.id_rol = 8;
     `;
-    const [rows] = await db.query(query);
-    return rows;
+  const [rows] = await db.query(query);
+  return rows;
 };
