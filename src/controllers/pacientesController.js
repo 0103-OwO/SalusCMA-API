@@ -98,34 +98,31 @@ export const deletePaciente = async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
-};
-// controllers/pacientesController.js
+}; 
+
 export const obtenerPerfilPaciente = async (req, res) => {
   try {
-    // Verificamos si req.usuario existe antes de pedir id_referencia
-    const idDesdeToken = req.usuario ? req.usuario.id_referencia : null;
-    const idDesdeParams = req.params.id;
+    // Extraemos el ID del token (validado por el middleware)
+    // Asegúrate de que en tu login guardaste el 'id_pacientes' en el token
+    const idPaciente = req.user.id;
 
-    const idPaciente = idDesdeParams || idDesdeToken;
+    const perfil = await usuarioModel.getPacienteFullProfile(idPaciente);
 
-    console.log("ID obtenido:", idPaciente);
-
-    if (!idPaciente) {
-      return res.status(401).json({
-        msg: "No se pudo identificar al usuario. Por favor, inicie sesión nuevamente."
+    if (!perfil) {
+      return res.status(404).json({
+        success: false,
+        error: 'No se encontraron datos para este paciente.'
       });
     }
 
-    const data = await model.getPacienteFullProfile(idPaciente);
+    res.json({
+      success: true,
+      datos: perfil
+    });
 
-    if (!data) {
-      return res.status(404).json({ msg: "Paciente no encontrado en la base de datos." });
-    }
-
-    res.json(data);
   } catch (error) {
-    console.error("ERROR EN CONTROLADOR:", error);
-    res.status(500).json({ msg: "Error interno del servidor." });
+    console.error("Error al obtener perfil:", error);
+    res.status(500).json({ success: false, error: 'Error interno del servidor' });
   }
 };
 
@@ -173,3 +170,4 @@ export const updatePacientePerfil = async (req, res) => {
     res.status(500).json({ msg: "Error en la actualización." });
   }
 };
+
