@@ -158,27 +158,77 @@ export const restablecerPassword = async (req, res) => {
 };
 
 export const obtenerPerfil = async (req, res) => {
-    try {
-        const { id, tipo } = req.user; 
+  try {
+    const { id, tipo } = req.user;
 
-        let query = "";
-        if (tipo === 'cliente') {
-            // Consulta para pacientes
-            query = "SELECT nombre, apellidos, correo, telefono, curp FROM pacientes WHERE id_paciente = ?";
-        } else {
-            // Consulta para trabajadores (internos)
-            query = "SELECT nombre, apellidos, correo, puesto FROM trabajadores WHERE id_trabajador = ?";
-        }
-
-        const [rows] = await db.query(query, [id]);
-
-        if (rows.length === 0) {
-            return res.status(404).json({ success: false, error: 'Usuario no encontrado' });
-        }
-
-        res.json({ success: true, datos: rows[0] });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ success: false, error: 'Error al obtener el perfil' });
+    let query = "";
+    if (tipo === 'cliente') {
+      // Consulta para pacientes
+      query = "SELECT nombre, apellidos, correo, telefono, curp FROM pacientes WHERE id_paciente = ?";
+    } else {
+      // Consulta para trabajadores (internos)
+      query = "SELECT nombre, apellidos, correo, puesto FROM trabajadores WHERE id_trabajador = ?";
     }
+
+    const [rows] = await db.query(query, [id]);
+
+    if (rows.length === 0) {
+      return res.status(404).json({ success: false, error: 'Usuario no encontrado' });
+    }
+
+    res.json({ success: true, datos: rows[0] });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, error: 'Error al obtener el perfil' });
+  }
+};
+
+export const desactivarPerfil = async (req, res) => {
+  try {
+    const idPaciente = req.usuario.id;
+
+    const resultado = await usuarioModel.desactivarCuentaPaciente(idPaciente);
+
+    if (resultado) {
+      res.json({ success: true, message: 'Cuenta desactivada con éxito.' });
+    } else {
+      res.status(400).json({ success: false, error: 'No se pudo desactivar la cuenta.' });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, error: 'Error interno del servidor.' });
+  }
+};
+
+export const reactivarCuenta = async (req, res) => {
+  const { identificador } = req.body;
+
+  if (!identificador) {
+    return res.status(400).json({
+      success: false,
+      error: 'El identificador es requerido para reactivar la cuenta.'
+    });
+  }
+
+  try {
+    const exito = await usuarioModel.reactivarCuentaPorIdentificador(identificador);
+
+    if (exito) {
+      return res.json({
+        success: true,
+        message: 'Cuenta reactivada exitosamente. Ya puedes iniciar sesión.'
+      });
+    } else {
+      return res.status(404).json({
+        success: false,
+        error: 'No se encontró una cuenta inactiva con esos datos.'
+      });
+    }
+  } catch (error) {
+    console.error("Error en controlador reactivarCuenta:", error);
+    return res.status(500).json({
+      success: false,
+      error: 'Ocurrió un error interno al intentar reactivar la cuenta.'
+    });
+  }
 };

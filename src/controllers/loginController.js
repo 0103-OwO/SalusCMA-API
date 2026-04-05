@@ -19,6 +19,15 @@ export const login = async (req, res) => {
             return res.status(401).json({ success: false, error: 'Credenciales incorrectas' });
         }
 
+        if (parseInt(user.activo) === 0) {
+            return res.status(403).json({
+                success: false,
+                cuentaInactiva: true,
+                error: 'Tu cuenta está desactivada.',
+                identificador: identificador // Lo enviamos de vuelta para facilitar la reactivación
+            });
+        }
+
         let nombreReal = 'Usuario';
 
         if (user.nombre_real) {
