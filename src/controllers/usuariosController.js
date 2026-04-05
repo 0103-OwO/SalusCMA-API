@@ -156,3 +156,29 @@ export const restablecerPassword = async (req, res) => {
     res.status(500).json({ error: 'No se pudo restablecer la contraseña' });
   }
 };
+
+export const obtenerPerfil = async (req, res) => {
+    try {
+        const { id, tipo } = req.user; 
+
+        let query = "";
+        if (tipo === 'cliente') {
+            // Consulta para pacientes
+            query = "SELECT nombre, apellidos, correo, telefono, curp FROM pacientes WHERE id_paciente = ?";
+        } else {
+            // Consulta para trabajadores (internos)
+            query = "SELECT nombre, apellidos, correo, puesto FROM trabajadores WHERE id_trabajador = ?";
+        }
+
+        const [rows] = await db.query(query, [id]);
+
+        if (rows.length === 0) {
+            return res.status(404).json({ success: false, error: 'Usuario no encontrado' });
+        }
+
+        res.json({ success: true, datos: rows[0] });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, error: 'Error al obtener el perfil' });
+    }
+};
