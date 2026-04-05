@@ -19,9 +19,34 @@ export const getPaciente = async (req, res) => {
   }
 };
 
+export const listarPacientesActivos = async (req, res) => {
+  try {
+    const pacientes = await model.obtenerPacientesActivos();
+
+    res.json(pacientes);
+
+  } catch (error) {
+    console.error("Error al listar pacientes activos:", error);
+    res.status(500).json({
+      success: false,
+      error: 'Error al obtener la lista de pacientes aptos para citas.'
+    });
+  }
+};
+
 export const createPaciente = async (req, res) => {
   try {
-    const { curp, usuario, contrasena } = req.body;
+    const {
+      curp,
+      nombre,
+      app,
+      apm,
+      sexo,
+      fecha_nac,
+      correo,
+      usuario,
+      contrasena
+    } = req.body;
 
     if (await model.checkCurpExists(curp)) {
       return res.status(400).json({ msg: "La CURP ya existe." });
@@ -38,9 +63,16 @@ export const createPaciente = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashContrasena = await bcrypt.hash(contrasena, salt);
 
-    await model.createPacienteCompleto({
-      ...req.body,
-      contrasena: hashContrasena
+    await model.createPacienteCompletoSP({
+      p_curp: curp.toUpperCase(),
+      p_nombre: nombre,
+      p_app: app,
+      p_apm: apm,
+      p_sexo: sexo,
+      p_fecha_nac: fecha_nac,
+      p_correo: correo,
+      p_usuario: usuario,
+      p_contrasena: hashContrasena
     });
 
     res.status(201).json({ msg: "Paciente y usuario registrados con éxito." });
@@ -98,36 +130,36 @@ export const deletePaciente = async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
-}; 
+};
 
 export const obtenerPerfilPaciente = async (req, res) => {
-    try {
-        // CAMBIO: Usamos 'usuario' porque así lo definió tu middleware
-        if (!req.usuario) {
-            return res.status(401).json({ success: false, error: 'No se encontró información de usuario' });
-        }
-
-        const idPaciente = req.usuario.id; 
-
-        // Tu modelo que ya definimos
-        const perfil = await model.getPacienteFullProfile(idPaciente);
-
-        if (!perfil) {
-            return res.status(404).json({ 
-                success: false, 
-                error: 'No se encontraron datos para este paciente.' 
-            });
-        }
-
-        res.json({
-            success: true,
-            datos: perfil
-        });
-
-    } catch (error) {
-        console.error("Error al obtener perfil:", error);
-        res.status(500).json({ success: false, error: 'Error interno del servidor' });
+  try {
+    // CAMBIO: Usamos 'usuario' porque así lo definió tu middleware
+    if (!req.usuario) {
+      return res.status(401).json({ success: false, error: 'No se encontró información de usuario' });
     }
+
+    const idPaciente = req.usuario.id;
+
+    // Tu modelo que ya definimos
+    const perfil = await model.getPacienteFullProfile(idPaciente);
+
+    if (!perfil) {
+      return res.status(404).json({
+        success: false,
+        error: 'No se encontraron datos para este paciente.'
+      });
+    }
+
+    res.json({
+      success: true,
+      datos: perfil
+    });
+
+  } catch (error) {
+    console.error("Error al obtener perfil:", error);
+    res.status(500).json({ success: false, error: 'Error interno del servidor' });
+  }
 };
 
 export const updatePacientePerfil = async (req, res) => {
@@ -176,37 +208,37 @@ export const updatePacientePerfil = async (req, res) => {
 };
 
 export const actualizarDatosPerfil = async (req, res) => {
-    try {
-        const idPaciente = req.usuario.id;
-        const { curp, nombre, app, apm, fecha_nac, correo, sexo, usuario } = req.body;
+  try {
+    const idPaciente = req.usuario.id;
+    const { curp, nombre, app, apm, fecha_nac, correo, sexo, usuario } = req.body;
 
-        //Validar CURP
-        if (await model.checkCurpExists(curp, idPaciente)) {
-            return res.status(400).json({ success: false, error: 'La CURP ya existe.' });
-        }
-
-        //Validar Correo
-        if (await model.checkEmailExistsUpdate(correo, idPaciente)) {
-            return res.status(400).json({ success: false, error: 'El correo ya existe.' });
-        }
-
-        //Validar Usuario (La nueva aduana)
-        if (await model.checkUserExistsUpdate(usuario, idPaciente)) {
-            return res.status(400).json({ success: false, error: 'El nombre de usuario ya existe.' });
-        }
-
-        // Si todo está bien, actualizamos las dos tablas
-        const exito = await model.actualizarPerfilCompletoPaciente(idPaciente, {
-            curp, nombre, app, apm, fecha_nac, correo, sexo, usuario
-        });
-
-        if (exito) {
-            res.json({ success: true, message: '¡Perfil actualizado con éxito!' });
-        }
-
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ success: false, error: 'Error interno al actualizar.' });
+    //Validar CURP
+    if (await model.checkCurpExists(curp, idPaciente)) {
+      return res.status(400).json({ success: false, error: 'La CURP ya existe.' });
     }
+
+    //Validar Correo
+    if (await model.checkEmailExistsUpdate(correo, idPaciente)) {
+      return res.status(400).json({ success: false, error: 'El correo ya existe.' });
+    }
+
+    //Validar Usuario (La nueva aduana)
+    if (await model.checkUserExistsUpdate(usuario, idPaciente)) {
+      return res.status(400).json({ success: false, error: 'El nombre de usuario ya existe.' });
+    }
+
+    // Si todo está bien, actualizamos las dos tablas
+    const exito = await model.actualizarPerfilCompletoPaciente(idPaciente, {
+      curp, nombre, app, apm, fecha_nac, correo, sexo, usuario
+    });
+
+    if (exito) {
+      res.json({ success: true, message: '¡Perfil actualizado con éxito!' });
+    }
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, error: 'Error interno al actualizar.' });
+  }
 };
 
