@@ -243,7 +243,7 @@ export const cambiarContrasena = async (req, res) => {
             return res.status(400).json({ msg: "No se pudo identificar el ID del usuario." });
         }
 
-        const cuenta = await model.getPasswordById(id, tipo);
+        const cuenta = await usuarioModel.getPasswordById(id, tipo);
 
         if (!cuenta) {
             return res.status(404).json({ msg: "Usuario no encontrado." });
@@ -257,7 +257,7 @@ export const cambiarContrasena = async (req, res) => {
         const salt = await bcrypt.genSalt(10);
         const nuevoHash = await bcrypt.hash(conNueva, salt);
 
-        await model.updatePassword(id, tipo, nuevoHash);
+        await usuarioModel.updatePassword(id, tipo, nuevoHash);
 
         res.status(200).json({ msg: "Contraseña actualizada con éxito." });
 
