@@ -236,7 +236,7 @@ export const reactivarCuenta = async (req, res) => {
 export const cambiarContrasena = async (req, res) => {
     try {
         const { conActual, conNueva } = req.body;
-        const { id_usuario, rol } = req.user; 
+        const { id_usuario, rol } = req.usuario; 
 
         const usuario = await usuarioModel.getPasswordById(id_usuario, rol);
 
