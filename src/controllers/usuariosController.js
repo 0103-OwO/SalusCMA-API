@@ -237,6 +237,8 @@ export const cambiarContrasena = async (req, res) => {
   try {
     const { conActual, conNueva } = req.body;
 
+    console.log("Contenido del Token decodificado:", req.usuario);
+
     const { id_interno, tipo_usuario } = req.usuario;
 
     if (!id_interno) {
