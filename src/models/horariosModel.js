@@ -93,3 +93,24 @@ export const getHorarioByMedico = async (id_trabajador) => {
     const [rows] = await db.query(query, [id_trabajador]);
     return rows;
 };
+
+export const verificarExistenciaHorario = async (id_trabajador, f_inicio, f_fin, id_horario_actual = null) => {
+    let query = `
+        SELECT COUNT(*) as total 
+        FROM horarios 
+        WHERE id_trabajador = ? 
+        AND (
+            (fecha_inicio <= ? AND fecha_fin >= ?) OR -- Traslape de fechas
+            (fecha_inicio <= ? AND fecha_fin >= ?)
+        )`;
+    
+    const params = [id_trabajador, f_inicio, f_inicio, f_fin, f_fin];
+
+    if (id_horario_actual) {
+        query += ` AND id_horario != ?`;
+        params.push(id_horario_actual);
+    }
+
+    const [rows] = await db.query(query, params);
+    return rows[0].total > 0;
+};

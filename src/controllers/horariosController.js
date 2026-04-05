@@ -19,7 +19,6 @@ export const getHorario = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-
 export const createHorario = async (req, res) => {
   try {
     const datos = req.body;
@@ -34,8 +33,21 @@ export const createHorario = async (req, res) => {
       if (datos[campo] === "") datos[campo] = null;
     });
 
+    const yaExiste = await model.verificarExistenciaHorario(
+      datos.id_trabajador,
+      datos.fecha_inicio,
+      datos.fecha_fin
+    );
+
+    if (yaExiste) {
+      return res.status(400).json({
+        error: "El médico seleccionado ya cuenta con un horario registrado en este periodo de fechas."
+      });
+    }
+
     const nuevo = await model.createHorario(datos);
-    res.status(201).json(nuevo);
+    res.status(201).json({ success: true, data: nuevo });
+
   } catch (error) {
     console.error("Error al crear horario:", error);
     res.status(500).json({ error: error.message });
@@ -44,6 +56,7 @@ export const createHorario = async (req, res) => {
 
 export const updateHorario = async (req, res) => {
   try {
+    const { id } = req.params;
     const datos = req.body;
 
     const camposHoras = [
@@ -56,9 +69,24 @@ export const updateHorario = async (req, res) => {
       if (datos[campo] === "") datos[campo] = null;
     });
 
-    const updated = await model.updateHorario(req.params.id, datos);
-    res.json(updated);
+    const yaExiste = await model.verificarExistenciaHorario(
+      datos.id_trabajador,
+      datos.fecha_inicio,
+      datos.fecha_fin,
+      id
+    );
+
+    if (yaExiste) {
+      return res.status(400).json({
+        error: "No se puede actualizar: El médico tiene otro horario que se traslapa con estas fechas."
+      });
+    }
+
+    const updated = await model.updateHorario(id, datos);
+    res.json({ success: true, data: updated });
+
   } catch (error) {
+    console.error("Error al actualizar horario:", error);
     res.status(500).json({ error: error.message });
   }
 };
