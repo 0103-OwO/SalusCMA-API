@@ -8,6 +8,8 @@ router.get('/perfil-paciente', verificarToken, ctrl.obtenerPerfilPaciente);
 
 router.put('/actualizar-perfil', verificarToken, ctrl.actualizarDatosPerfil);
 
+router.get('/activos', verificarToken, ctrl.listarPacientesActivos);
+
 
 router.get('/:id', verificarToken, ctrl.getPaciente);
 
