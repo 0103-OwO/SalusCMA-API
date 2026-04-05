@@ -7,11 +7,12 @@ const router = Router();
 router.get('/' ,usuarios.listar);
 router.get('/:id', usuarios.obtenerUno);
 
+router.post('/reactivar', usuarios.reactivarCuenta);
+router.put('/desactivar', usuarios.desactivarPerfil);
+
 router.post('/',verificarToken, usuarios.crear);
 router.put('/:id',verificarToken, usuarios.actualizar);
 router.delete('/:id', verificarToken, usuarios.eliminar);
-router.post('/reactivar', usuarios.reactivarCuenta);
-router.put('/desactivar', usuarios.desactivarPerfil);
 
 router.post('/solicitar-recuperacion', usuarios.solicitarRecuperacion);
 router.post('/restablecer-password', usuarios.restablecerPassword);
