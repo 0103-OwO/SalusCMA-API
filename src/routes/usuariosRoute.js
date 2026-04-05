@@ -8,7 +8,7 @@ router.get('/' ,usuarios.listar);
 router.get('/:id', usuarios.obtenerUno);
 
 router.post('/reactivar', usuarios.reactivarCuenta);
-router.put('/desactivar', usuarios.desactivarPerfil);
+router.put('/desactivar',verificarToken, usuarios.desactivarPerfil);
 
 router.post('/',verificarToken, usuarios.crear);
 router.put('/:id',verificarToken, usuarios.actualizar);
