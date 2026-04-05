@@ -53,9 +53,16 @@ export const createPaciente = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashContrasena = await bcrypt.hash(contrasena, salt);
 
-    await model.createPacienteCompleto({
-      ...req.body,
-      contrasena: hashContrasena
+    await model.createPacienteCompletoSP({
+      p_curp: curp.toUpperCase(),
+      p_nombre: nombre,
+      p_app: app,
+      p_apm: apm,
+      p_sexo: sexo,
+      p_fecha_nac: fecha_nac,
+      p_correo: correo,
+      p_usuario: usuario,
+      p_contrasena: hashContrasena
     });
 
     res.status(201).json({ msg: "Paciente y usuario registrados con éxito." });
