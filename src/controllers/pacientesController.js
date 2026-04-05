@@ -36,11 +36,7 @@ export const listarPacientesActivos = async (req, res) => {
 
 export const createPaciente = async (req, res) => {
   try {
-    const {
-      curp, nombre, app, apm, sexo, fecha_nac, correo, usuario, contrasena
-    } = req.body;
-
-    console.log("Datos en backend:", { curp, app, fecha_nac });
+    const { curp, usuario, contrasena } = req.body;
 
     if (await model.checkCurpExists(curp)) {
       return res.status(400).json({ msg: "La CURP ya existe." });
@@ -57,16 +53,9 @@ export const createPaciente = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashContrasena = await bcrypt.hash(contrasena, salt);
 
-    await model.createPacienteCompletoSP({
-      p_curp: curp.toUpperCase(),
-      p_nombre: nombre,
-      p_app: app,
-      p_apm: apm,
-      p_sexo: sexo,
-      p_fecha_nac: fecha_nac,
-      p_correo: correo,
-      p_usuario: usuario,
-      p_contrasena: hashContrasena
+    await model.createPacienteCompleto({
+      ...req.body,
+      contrasena: hashContrasena
     });
 
     res.status(201).json({ msg: "Paciente y usuario registrados con éxito." });

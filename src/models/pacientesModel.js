@@ -232,21 +232,3 @@ export const actualizarPerfilCompletoPaciente = async (id, datos) => {
   }
 };
 
-export const createPacienteCompletoSP = async (datos) => {
-  const {
-    curp, nombre, apellido_paterno, apellido_materno,
-    sexo, fecha_nacimiento, correo, usuario, contrasena
-  } = datos;
-
-  try {
-    const [result] = await db.query(
-      'CALL sp_registrar_paciente_completo(?, ?, ?, ?, ?, ?, ?, ?, ?)',
-      [curp, nombre, apellido_paterno, apellido_materno, sexo, fecha_nacimiento, correo, usuario, contrasena]
-    );
-    
-    return { success: true, message: 'Registrado mediante SP' };
-  } catch (error) {
-    console.error("Error en SP:", error.message);
-    throw error;
-  }
-};
