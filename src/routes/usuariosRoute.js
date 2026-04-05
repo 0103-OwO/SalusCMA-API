@@ -7,7 +7,7 @@ const router = Router();
 router.get('/' ,usuarios.listar);
 router.get('/:id', usuarios.obtenerUno);
 
-router.post('/reactivar', usuarios.reactivarCuenta);
+router.put('/reactivar', usuarios.reactivarCuenta);
 router.put('/desactivar',verificarToken, usuarios.desactivarPerfil);
 
 router.post('/',verificarToken, usuarios.crear);
