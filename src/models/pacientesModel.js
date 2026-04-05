@@ -18,9 +18,9 @@ export const checkUserExists = async (usuario) => {
 };
 
 export const checkUserExistsUpdate = async (usuario, idPaciente) => {
-  const query = `SELECT id_paciente FROM usuarios_clientes WHERE usuario = ? AND id_paciente != ?`;
-  const [rows] = await db.query(query, [usuario, idPaciente]);
-  return rows.length > 0;
+    const query = `SELECT id_paciente FROM usuarios_clientes WHERE usuario = ? AND id_paciente != ?`;
+    const [rows] = await db.query(query, [usuario, idPaciente]);
+    return rows.length > 0;
 };
 
 export const getAllPacientes = async () => {
@@ -34,31 +34,6 @@ export const getPacienteById = async (id) => {
     [id]
   );
   return rows[0];
-};
-
-export const obtenerPacientesActivos = async () => {
-  try {
-    // Unimos las tablas para saber quién está activo (1)
-    const query = `
-            SELECT 
-                p.id_pacientes, 
-                p.curp, 
-                p.nombre, 
-                p.apellido_paterno, 
-                p.apellido_materno,
-                u.activo
-            FROM pacientes p
-            INNER JOIN usuarios_clientes u ON p.id_pacientes = u.id_paciente
-            WHERE u.activo = 1
-            ORDER BY p.nombre ASC
-        `;
-
-    const [rows] = await db.query(query);
-    return rows;
-  } catch (error) {
-    console.error("Error en modelo obtenerPacientesActivos:", error);
-    throw error;
-  }
 };
 
 export const createPaciente = async ({
@@ -191,7 +166,7 @@ export const checkEmailExists = async (email) => {
 };
 
 export const checkEmailExistsUpdate = async (email, idPaciente) => {
-  const query = `
+    const query = `
         SELECT email FROM (
             SELECT email, id_paciente FROM usuarios_clientes
             UNION
@@ -199,54 +174,35 @@ export const checkEmailExistsUpdate = async (email, idPaciente) => {
         ) AS todos_los_correos
         WHERE email = ? AND id_paciente != ? LIMIT 1
     `;
-  const [rows] = await db.query(query, [email, idPaciente]);
-  return rows.length > 0;
+    const [rows] = await db.query(query, [email, idPaciente]);
+    return rows.length > 0;
 };
 
 export const actualizarPerfilCompletoPaciente = async (id, datos) => {
-  const connection = await db.getConnection();
-  try {
-    await connection.beginTransaction();
+    const connection = await db.getConnection();
+    try {
+        await connection.beginTransaction();
 
-    //Actualizar datos personales en la tabla 'pacientes'
-    await connection.query(
-      `UPDATE pacientes 
+        //Actualizar datos personales en la tabla 'pacientes'
+        await connection.query(
+            `UPDATE pacientes 
              SET curp = ?, nombre = ?, apellido_paterno = ?, apellido_materno = ?, fecha_nacimiento = ?, sexo = ? 
              WHERE id_pacientes = ?`,
-      [datos.curp, datos.nombre, datos.app, datos.apm, datos.fecha_nac, datos.sexo, id]
-    );
+            [datos.curp, datos.nombre, datos.app, datos.apm, datos.fecha_nac, datos.sexo, id]
+        );
 
-    //Actualizar el correo en la tabla 'usuarios_clientes'
-    await connection.query(
-      `UPDATE usuarios_clientes SET email = ? WHERE id_paciente = ?`,
-      [datos.correo, id]
-    );
+        //Actualizar el correo en la tabla 'usuarios_clientes'
+        await connection.query(
+            `UPDATE usuarios_clientes SET email = ? WHERE id_paciente = ?`,
+            [datos.correo, id]
+        );
 
-    await connection.commit();
-    return true;
-  } catch (error) {
-    await connection.rollback();
-    throw error;
-  } finally {
-    connection.release();
-  }
-};
-
-export const createPacienteCompletoSP = async (datos) => {
-  const {
-    curp, nombre, apellido_paterno, apellido_materno,
-    sexo, fecha_nacimiento, correo, usuario, contrasena
-  } = datos;
-
-  try {
-    const [result] = await db.query(
-      'CALL sp_registrar_paciente_completo(?, ?, ?, ?, ?, ?, ?, ?, ?)',
-      [curp, nombre, apellido_paterno, apellido_materno, sexo, fecha_nacimiento, correo, usuario, contrasena]
-    );
-    
-    return { success: true, message: 'Registrado mediante SP' };
-  } catch (error) {
-    console.error("Error en SP:", error.message);
-    throw error;
-  }
+        await connection.commit();
+        return true;
+    } catch (error) {
+        await connection.rollback();
+        throw error;
+    } finally {
+        connection.release();
+    }
 };
