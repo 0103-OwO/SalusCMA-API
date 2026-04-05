@@ -36,7 +36,17 @@ export const listarPacientesActivos = async (req, res) => {
 
 export const createPaciente = async (req, res) => {
   try {
-    const { curp, usuario, contrasena } = req.body;
+    const {
+      curp,
+      nombre,
+      app,
+      apm,
+      sexo,
+      fecha_nac,
+      correo,
+      usuario,
+      contrasena
+    } = req.body;
 
     if (await model.checkCurpExists(curp)) {
       return res.status(400).json({ msg: "La CURP ya existe." });
