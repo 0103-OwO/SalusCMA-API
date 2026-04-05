@@ -234,37 +234,35 @@ export const reactivarCuenta = async (req, res) => {
 };
 
 export const cambiarContrasena = async (req, res) => {
-  try {
-    const { conActual, conNueva } = req.body;
+    try {
+        const { conActual, conNueva } = req.body;
+        
+        const { id, tipo } = req.usuario; 
 
-    console.log("Contenido del Token decodificado:", req.usuario);
+        if (!id) {
+            return res.status(400).json({ msg: "No se pudo identificar el ID del usuario." });
+        }
 
-    const { id_interno, tipo_usuario } = req.usuario;
+        const cuenta = await model.getPasswordById(id, tipo);
 
-    if (!id_interno) {
-      return res.status(400).json({ msg: "No se pudo identificar al usuario." });
+        if (!cuenta) {
+            return res.status(404).json({ msg: "Usuario no encontrado." });
+        }
+
+        const isMatch = await bcrypt.compare(conActual, cuenta.contrasena);
+        if (!isMatch) {
+            return res.status(400).json({ msg: "La contraseña actual es incorrecta." });
+        }
+
+        const salt = await bcrypt.genSalt(10);
+        const nuevoHash = await bcrypt.hash(conNueva, salt);
+
+        await model.updatePassword(id, tipo, nuevoHash);
+
+        res.status(200).json({ msg: "Contraseña actualizada con éxito." });
+
+    } catch (error) {
+        console.error("Error en cambiarContrasena:", error);
+        res.status(500).json({ msg: "Error interno del servidor." });
     }
-
-    const cuenta = await model.getPasswordById(id_interno, tipo_usuario);
-
-    if (!cuenta) {
-      return res.status(404).json({ msg: "Usuario no encontrado en la base de datos." });
-    }
-
-    const isMatch = await bcrypt.compare(conActual, cuenta.contrasena);
-    if (!isMatch) {
-      return res.status(400).json({ msg: "La contraseña actual es incorrecta." });
-    }
-
-    const salt = await bcrypt.genSalt(10);
-    const nuevoHash = await bcrypt.hash(conNueva, salt);
-
-    await model.updatePassword(id_interno, tipo_usuario, nuevoHash);
-
-    res.status(200).json({ msg: "Contraseña actualizada con éxito." });
-
-  } catch (error) {
-    console.error("Error en cambiarContrasena:", error);
-    res.status(500).json({ msg: "Error interno del servidor." });
-  }
 };
