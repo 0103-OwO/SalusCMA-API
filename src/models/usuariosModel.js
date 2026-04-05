@@ -99,3 +99,21 @@ export const reactivarCuentaPorIdentificador = async (identificador) => {
     throw error;
   }
 };
+
+export const getPasswordById = async (id, rol) => {
+    const tabla = (rol === 'paciente') ? 'usuarios_clientes' : 'trabajadores';
+    const campoId = (rol === 'paciente') ? 'id_usuario' : 'id_trabajador';
+
+    const query = `SELECT contrasena FROM ${tabla} WHERE ${campoId} = ?`;
+    const [rows] = await db.query(query, [id]);
+    return rows[0];
+};
+
+export const updatePassword = async (id, rol, nuevoHash) => {
+    const tabla = (rol === 'paciente') ? 'usuarios_clientes' : 'trabajadores';
+    const campoId = (rol === 'paciente') ? 'id_usuario' : 'id_trabajador';
+
+    const query = `UPDATE ${tabla} SET contrasena = ? WHERE ${campoId} = ?`;
+    await db.query(query, [nuevoHash, id]);
+    return true;
+};

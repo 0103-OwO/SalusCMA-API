@@ -232,3 +232,32 @@ export const reactivarCuenta = async (req, res) => {
     });
   }
 };
+
+export const cambiarContrasena = async (req, res) => {
+    try {
+        const { conActual, conNueva } = req.body;
+        const { id_usuario, rol } = req.user; 
+
+        const usuario = await usuarioModel.getPasswordById(id_usuario, rol);
+
+        if (!usuario) {
+            return res.status(404).json({ msg: "Usuario no encontrado." });
+        }
+
+        const isMatch = await bcrypt.compare(conActual, usuario.contrasena);
+        if (!isMatch) {
+            return res.status(400).json({ msg: "La contraseña actual no es correcta." });
+        }
+
+        const salt = await bcrypt.genSalt(10);
+        const nuevoHash = await bcrypt.hash(conNueva, salt);
+
+        await usuarioModel.updatePassword(id_usuario, rol, nuevoHash);
+
+        res.status(200).json({ msg: "Contraseña actualizada exitosamente." });
+
+    } catch (error) {
+        console.error("Error en cambiarContrasena:", error);
+        res.status(500).json({ error: "Error interno al procesar el cambio." });
+    }
+};

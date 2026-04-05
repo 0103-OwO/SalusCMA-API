@@ -9,6 +9,7 @@ router.get('/:id', usuarios.obtenerUno);
 
 router.put('/reactivar', usuarios.reactivarCuenta);
 router.put('/desactivar',verificarToken, usuarios.desactivarPerfil);
+router.put('/cambiar-contrasena', verificarToken, usuarios.cambiarContrasena);
 
 router.post('/',verificarToken, usuarios.crear);
 router.put('/:id',verificarToken, usuarios.actualizar);
