@@ -100,28 +100,20 @@ export const reactivarCuentaPorIdentificador = async (identificador) => {
   }
 };
 
-export const getPasswordById = async (id, tipo_usuario) => {
-  let query = '';
-  if (tipo_usuario === 'cliente') {
-    query = `SELECT contrasena FROM usuarios_clientes WHERE id_usuario_cliente = ?`;
-  }
-  else {
-    query = `SELECT contrasena FROM usuario WHERE id_usuario = ?`;
-  }
+export const getPasswordById = async (id, tipo) => {
+    const tabla = (tipo === 'cliente') ? 'usuarios_clientes' : 'usuario';
+    const campoId = (tipo === 'cliente') ? 'id_usuario_cliente' : 'id_usuario';
 
-  const [rows] = await db.query(query, [id]);
-  return rows[0];
+    const query = `SELECT contrasena FROM ${tabla} WHERE ${campoId} = ?`;
+    const [rows] = await db.query(query, [id]);
+    return rows[0];
 };
 
-export const updatePassword = async (id, tipo_usuario, nuevoHash) => {
-    let query = '';
-    
-    if (tipo_usuario === 'cliente') {
-        query = `UPDATE usuarios_clientes SET contrasena = ? WHERE id_usuario_cliente = ?`;
-    } else {
-        query = `UPDATE usuario SET contrasena = ? WHERE id_usuario = ?`;
-    }
+export const updatePassword = async (id, tipo, nuevoHash) => {
+    const tabla = (tipo === 'cliente') ? 'usuarios_clientes' : 'usuario';
+    const campoId = (tipo === 'cliente') ? 'id_usuario_cliente' : 'id_usuario';
 
+    const query = `UPDATE ${tabla} SET contrasena = ? WHERE ${campoId} = ?`;
     await db.query(query, [nuevoHash, id]);
     return true;
 };
