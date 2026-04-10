@@ -5,6 +5,7 @@ import { verificarToken } from '../middleware/authMiddleware.js';
 const router = express.Router();
 
 router.get('/mis-historiales', verificarToken, historialCtrl.getHistorialesMedico);
+router.get('/', verificarToken, historialCtrl.getTodosLosHistoriales);
 router.get('/:id', verificarToken, historialCtrl.getHistorial);
 router.post('/registrar', verificarToken, historialCtrl.crearHistorialDesdeCita);
 router.put('/:id', verificarToken, historialCtrl.actualizarHistorial);

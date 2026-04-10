@@ -45,6 +45,16 @@ export const getHistorial = async (req, res) => {
     }
 };
 
+export const getTodosLosHistoriales = async (req, res) => {
+    try {
+        const data = await model.getAllHistoriales(); 
+        res.json(data || []);
+    } catch (error) {
+        console.error("Error en getTodosLosHistoriales:", error);
+        res.status(500).json({ error: "Error al obtener el listado completo" });
+    }
+};
+
 export const actualizarHistorial = async (req, res) => {
     try {
         const id = req.params.id;
