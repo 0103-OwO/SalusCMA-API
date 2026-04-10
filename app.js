@@ -18,10 +18,16 @@ import loginRoutes from './src/routes/loginRoute.js';
 import usuariosRoutes from './src/routes/usuariosRoute.js';
 import rolRoutes from './src/routes/rolRoute.js';
 import historialRoutes from './src/routes/historialRoute.js';
+import e from 'express';
 
 const app = express();
 
-app.use(cors());
+app.use(cors({
+    origin: ['https://0103-owo.github.io', 'http://localhost:3000'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    credentials: true
+}));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -55,11 +61,10 @@ app.use('/api/pacientes', pacientesRoutes);
 
 app.use('/api/historial', historialRoutes);
 
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+    console.log(`Servidor corriendo en el puerto ${PORT}`);
+});
 
 export default app;
-
-if (process.env.NODE_ENV !== 'production') {
-  app.listen(3000, () =>
-    console.log('Servidor corriendo en el puerto 3000')
-  );
-}
