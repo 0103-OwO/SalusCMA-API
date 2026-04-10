@@ -14,12 +14,29 @@ export const registrarHistorialProceso = async (datos) => {
 
 export const getAllHistoriales = async () => {
     const query = `
-        SELECT h.*, p.curp AS curp_paciente, 
-        CONCAT(t.nombre, ' ', t.apellido_paterno) AS nombre_medico
+        SELECT 
+            h.id_historial,
+            h.numero_cita,
+            h.id_paciente,
+            p.curp AS curp_paciente,
+            CONCAT(p.nombre, ' ', p.apellido_paterno) AS nombre_paciente,
+            h.id_medico,
+            CONCAT(t.nombre, ' ', t.apellido_paterno) AS nombre_medico,
+            h.id_consultorio,
+            con.nombre AS nombre_consultorio,
+            DATE_FORMAT(h.fecha, '%Y-%m-%d') AS fecha,
+            h.hora,
+            h.tension_arterial,
+            h.peso,
+            h.talla,
+            h.temperatura,
+            h.descripcion
         FROM historial h
         INNER JOIN pacientes p ON h.id_paciente = p.id_pacientes
         INNER JOIN trabajadores t ON h.id_medico = t.id_trabajador
+        LEFT JOIN consultorio con ON h.id_consultorio = con.id_consultorio
         ORDER BY h.fecha DESC, h.hora DESC`;
+
     const [rows] = await db.query(query);
     return rows;
 };
