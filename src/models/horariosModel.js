@@ -147,3 +147,17 @@ export const verificarConsultorioOcupado = async (id_consultorio, f_inicio, f_fi
     const [rows] = await db.query(query, params);
     return rows[0].total > 0;
 };
+
+export const getRelacionMedicoConsultorio = async () => {
+    const query = `
+        SELECT 
+            h.id_trabajador,
+            h.id_consultorio,
+            c.nombre AS nombre_consultorio
+        FROM horarios h
+        INNER JOIN consultorio c ON h.id_consultorio = c.id_consultorio
+        WHERE CURDATE() BETWEEN h.fecha_inicio AND h.fecha_fin
+    `;
+    const [rows] = await db.query(query);
+    return rows;
+};

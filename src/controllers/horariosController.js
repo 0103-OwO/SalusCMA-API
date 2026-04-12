@@ -150,3 +150,13 @@ export const getHorarioMedico = async (req, res) => {
     res.status(500).json({ error: "Error interno al obtener el horario laboral." });
   }
 };
+
+export const obtenerAsignacionesActivas = async (req, res) => {
+    try {
+        const data = await model.getRelacionMedicoConsultorio();
+        res.json(data);
+    } catch (error) {
+        console.error("Error en obtenerAsignacionesActivas:", error);
+        res.status(500).json({ error: 'Error al obtener asignaciones' });
+    }
+};
