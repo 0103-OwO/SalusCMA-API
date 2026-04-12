@@ -33,6 +33,8 @@ export const createHorario = async (req, res) => {
       if (datos[campo] === "") datos[campo] = null;
     });
 
+    if (datos.id_consultorio === "") datos.id_consultorio = null;
+
     const yaExiste = await model.verificarExistenciaHorario(
       datos.id_trabajador,
       datos.fecha_inicio,
@@ -42,6 +44,18 @@ export const createHorario = async (req, res) => {
     if (yaExiste) {
       return res.status(400).json({
         error: "El médico seleccionado ya cuenta con un horario registrado en este periodo de fechas."
+      });
+    }
+
+    const consultorioOcupado = await model.verificarConsultorioOcupado(
+      datos.id_consultorio,
+      datos.fecha_inicio,
+      datos.fecha_fin
+    );
+
+    if (consultorioOcupado) {
+      return res.status(400).json({
+        error: "El consultorio seleccionado ya está asignado a otro médico en este periodo de fechas."
       });
     }
 
@@ -69,6 +83,8 @@ export const updateHorario = async (req, res) => {
       if (datos[campo] === "") datos[campo] = null;
     });
 
+    if (datos.id_consultorio === "") datos.id_consultorio = null;
+
     const yaExiste = await model.verificarExistenciaHorario(
       datos.id_trabajador,
       datos.fecha_inicio,
@@ -79,6 +95,19 @@ export const updateHorario = async (req, res) => {
     if (yaExiste) {
       return res.status(400).json({
         error: "No se puede actualizar: El médico tiene otro horario que se traslapa con estas fechas."
+      });
+    }
+
+    const consultorioOcupado = await model.verificarConsultorioOcupado(
+      datos.id_consultorio,
+      datos.fecha_inicio,
+      datos.fecha_fin,
+      id
+    );
+
+    if (consultorioOcupado) {
+      return res.status(400).json({
+        error: "No se puede actualizar: El consultorio ya está ocupado por otro médico en este periodo."
       });
     }
 
