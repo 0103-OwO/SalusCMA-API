@@ -65,3 +65,13 @@ export const actualizarHistorial = async (req, res) => {
         res.status(500).json({ error: "Error interno al actualizar" });
     }
 };
+
+export const getResumenMensual = async (req, res) => {
+    try {
+        const data = await model.getResumenMensual();
+        res.json(data || []);
+    } catch (error) {
+        console.error("Error en getResumenMensual:", error);
+        res.status(500).json({ error: "Error al obtener resumen mensual" });
+    }
+};

@@ -20,6 +20,8 @@ export const getAllHistoriales = async () => {
             h.id_paciente,
             p.curp AS curp_paciente,
             CONCAT(p.nombre, ' ', p.apellido_paterno) AS nombre_paciente,
+            p.fecha_nacimiento,
+            p.sexo,
             h.id_medico,
             CONCAT(t.nombre, ' ', t.apellido_paterno) AS nombre_medico,
             h.id_consultorio,
@@ -77,6 +79,18 @@ export const getHistorialesByMedico = async (id_trabajador) => {
         WHERE h.id_medico = ?
         ORDER BY h.fecha DESC, h.hora DESC`;
     const [rows] = await db.query(query, [id_trabajador]);
+    return rows;
+};
+
+export const getResumenMensual = async () => {
+    const query = `
+        SELECT
+            DATE_FORMAT(h.fecha, '%Y-%m') AS mes,
+            COUNT(*)                       AS total_citas
+        FROM historial h
+        GROUP BY DATE_FORMAT(h.fecha, '%Y-%m')
+        ORDER BY mes ASC`;
+    const [rows] = await db.query(query);
     return rows;
 };
 
